@@ -278,7 +278,7 @@
                 padding: 20px;
                 margin: 10px;
             }
-            
+
             h1 {
                 font-size: 24px;
             }
@@ -332,7 +332,7 @@
         <!-- Lista de Notas Fiscais -->
         <div class="notas-section">
             <h2>Notas Fiscais Escaneadas (<span id="contador">0</span>)</h2>
-            
+
             <div id="listaNotas" class="lista-notas">
                 <p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>
             </div>
@@ -383,17 +383,17 @@
         async function iniciarCamera() {
             try {
                 html5QrCode = new Html5Qrcode("reader");
-                
+
                 cameraContainer.style.display = 'block';
                 btnEscanear.style.display = 'none';
-                
+
                 // Configurações para leitura de código de barras
                 const config = {
                     fps: 10, // Frames por segundo
                     qrbox: { width: 300, height: 150 }, // Área de leitura
                     aspectRatio: 1.777778 // 16:9
                 };
-                
+
                 // Iniciar escaneamento
                 await html5QrCode.start(
                     { facingMode: "environment" }, // Câmera traseira
@@ -412,9 +412,9 @@
                     alert('Erro ao iniciar o scanner: ' + err);
                     pararCamera();
                 });
-                
+
                 console.log('Scanner iniciado com sucesso!');
-                
+
             } catch (erro) {
                 console.error('Erro ao acessar câmera:', erro);
                 alert('Erro ao acessar a câmera: ' + erro.message + '\n\nVerifique se você deu permissão para usar a câmera.');
@@ -433,7 +433,7 @@
                 }
                 html5QrCode = null;
             }
-            
+
             cameraContainer.style.display = 'none';
             btnEscanear.style.display = 'flex';
         }
@@ -443,17 +443,17 @@
             const numeroNF = extrairNumeroNF(codigoBarras);
             const nomeColaborador = inputNomeColaborador.value.trim();
             const nomeLoja = inputNomeLoja.value.trim();
-            
+
             if (numeroNF && nomeColaborador && nomeLoja) {
                 const jaExiste = notasFiscais.some(
                     nota => nota.numeroNF === numeroNF && nota.loja === nomeLoja && nota.colaborador === nomeColaborador
                 );
-                
+
                 if (jaExiste) {
                     mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
                     return;
                 }
-                
+
                 const novaEntrada = {
                     id: Date.now(),
                     colaborador: nomeColaborador,
@@ -468,17 +468,17 @@
                         minute: '2-digit'
                     })
                 };
-                
+
                 notasFiscais.unshift(novaEntrada);
                 atualizarLista();
                 mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
                 salvarNoLocalStorage();
-                
+
                 // Para a câmera após leitura bem-sucedida
                 setTimeout(() => {
                     pararCamera();
                 }, 1000);
-                
+
                 console.log('Nota fiscal salva:', novaEntrada);
             } else if (numeroNF) {
                 // Se o código for válido mas dados incompletos
@@ -492,7 +492,7 @@
             feedback.textContent = mensagem;
             feedback.style.backgroundColor = cor;
             feedback.style.display = 'block';
-            
+
             setTimeout(() => {
                 feedback.style.display = 'none';
             }, 3000);
@@ -501,12 +501,12 @@
         // Função para atualizar a lista de notas
         function atualizarLista() {
             contador.textContent = notasFiscais.length;
-            
+
             if (notasFiscais.length === 0) {
                 listaNotas.innerHTML = '<p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>';
                 return;
             }
-            
+
             listaNotas.innerHTML = notasFiscais.map(nota => `
                 <div class="nota-card">
                     <div class="nota-colaborador">${nota.colaborador}</div>
