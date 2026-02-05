@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner DANFE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+            color: #1f2937;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #374151;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-danger {
+            width: 100%;
+            padding: 12px;
+            background: #ef4444;
+            color: white;
+            font-size: 15px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            font-size: 15px;
+            margin-top: 8px;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .camera-container {
+            margin-bottom: 20px;
+        }
+
+        #reader {
+            border: 2px solid #667eea;
+        }
+
+        .camera-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .feedback {
+            padding: 14px;
+            background: #10b981;
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notas-section {
+            margin-top: 24px;
+        }
+
+        .lista-notas {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .lista-notas::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .lista-notas::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .lista-notas::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .lista-notas::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #9ca3af;
+            padding: 32px 20px;
+            font-size: 14px;
+        }
+
+        .nota-card {
+            padding: 16px;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            animation: fadeIn 0.3s ease;
+            transition: all 0.3s ease;
+        }
+
+        .nota-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nota-colaborador {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #764ba2;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nota-colaborador::before {
+            content: "👤";
+            font-size: 14px;
+        }
+
+        .nota-loja {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #1f2937;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nota-loja::before {
+            content: "🏪";
+            font-size: 14px;
+        }
+
+        .nota-numero {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .nota-data {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scanner DANFE</h1>
+
+        <!-- Input Nome do Colaborador -->
+        <div class="form-group">
+            <label for="nomeColaborador">Nome do Colaborador:</label>
+            <input 
+                type="text" 
+                id="nomeColaborador" 
+                placeholder="Digite seu nome"
+            >
+        </div>
+
+        <!-- Input Nome da Loja -->
+        <div class="form-group">
+            <label for="nomeLoja">Nome da Loja:</label>
+            <input 
+                type="text" 
+                id="nomeLoja" 
+                placeholder="Digite o nome da loja"
+            >
+        </div>
+
+        <!-- Botão Escanear -->
+        <button id="btnEscanear" class="btn-primary" disabled>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            Escanear Código de Barras
+        </button>
+
+        <!-- Área da Câmera -->
+        <div id="cameraContainer" class="camera-container" style="display: none;">
+            <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
+            <div class="camera-buttons">
+                <button id="btnFechar" class="btn-danger">Fechar Câmera</button>
+            </div>
+        </div>
+
+        <!-- Feedback de Scan -->
+        <div id="feedback" class="feedback" style="display: none;"></div>
+
+        <!-- Lista de Notas Fiscais -->
+        <div class="notas-section">
+            <h2>Notas Fiscais Escaneadas (<span id="contador">0</span>)</h2>
+            
+            <div id="listaNotas" class="lista-notas">
+                <p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biblioteca para leitura de código de barras -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+        // Variáveis globais
+        let notasFiscais = [];
+        let html5QrCode = null;
+
+        // Elementos do DOM
+        const inputNomeColaborador = document.getElementById('nomeColaborador');
+        const inputNomeLoja = document.getElementById('nomeLoja');
+        const btnEscanear = document.getElementById('btnEscanear');
+        const btnFechar = document.getElementById('btnFechar');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const feedback = document.getElementById('feedback');
+        const listaNotas = document.getElementById('listaNotas');
+        const contador = document.getElementById('contador');
+
+        // Event Listeners
+        inputNomeColaborador.addEventListener('input', validarCampos);
+        inputNomeLoja.addEventListener('input', validarCampos);
+
+        btnEscanear.addEventListener('click', iniciarCamera);
+        btnFechar.addEventListener('click', pararCamera);
+
+        // Função para validar se ambos os campos estão preenchidos
+        function validarCampos() {
+            const colaboradorPreenchido = inputNomeColaborador.value.trim();
+            const lojaPreenchida = inputNomeLoja.value.trim();
+            btnEscanear.disabled = !(colaboradorPreenchido && lojaPreenchida);
+        }
+
+        // Função para extrair número da nota fiscal do código de barras DANFE
+        function extrairNumeroNF(codigoBarras) {
+            if (codigoBarras && codigoBarras.length === 44) {
+                return codigoBarras.substring(27, 36);
+            }
+            return null;
+        }
+
+        // Função para iniciar a câmera com leitor de código de barras
+        async function iniciarCamera() {
+            try {
+                html5QrCode = new Html5Qrcode("reader");
+                
+                cameraContainer.style.display = 'block';
+                btnEscanear.style.display = 'none';
+                
+                // Configurações para leitura de código de barras
+                const config = {
+                    fps: 10, // Frames por segundo
+                    qrbox: { width: 300, height: 150 }, // Área de leitura
+                    aspectRatio: 1.777778 // 16:9
+                };
+                
+                // Iniciar escaneamento
+                await html5QrCode.start(
+                    { facingMode: "environment" }, // Câmera traseira
+                    config,
+                    (decodedText, decodedResult) => {
+                        // Callback quando código é detectado
+                        console.log('Código detectado:', decodedText);
+                        processarCodigo(decodedText);
+                    },
+                    (errorMessage) => {
+                        // Callback de erro (opcional, pode ignorar)
+                        // Não precisa fazer nada aqui
+                    }
+                ).catch((err) => {
+                    console.error('Erro ao iniciar scanner:', err);
+                    alert('Erro ao iniciar o scanner: ' + err);
+                    pararCamera();
+                });
+                
+                console.log('Scanner iniciado com sucesso!');
+                
+            } catch (erro) {
+                console.error('Erro ao acessar câmera:', erro);
+                alert('Erro ao acessar a câmera: ' + erro.message + '\n\nVerifique se você deu permissão para usar a câmera.');
+                pararCamera();
+            }
+        }
+
+        // Função para parar a câmera
+        async function pararCamera() {
+            if (html5QrCode) {
+                try {
+                    await html5QrCode.stop();
+                    html5QrCode.clear();
+                } catch (err) {
+                    console.error('Erro ao parar câmera:', err);
+                }
+                html5QrCode = null;
+            }
+            
+            cameraContainer.style.display = 'none';
+            btnEscanear.style.display = 'flex';
+        }
+
+        // Função para processar código escaneado
+        function processarCodigo(codigoBarras) {
+            const numeroNF = extrairNumeroNF(codigoBarras);
+            const nomeColaborador = inputNomeColaborador.value.trim();
+            const nomeLoja = inputNomeLoja.value.trim();
+            
+            if (numeroNF && nomeColaborador && nomeLoja) {
+                const jaExiste = notasFiscais.some(
+                    nota => nota.numeroNF === numeroNF && nota.loja === nomeLoja && nota.colaborador === nomeColaborador
+                );
+                
+                if (jaExiste) {
+                    mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
+                    return;
+                }
+                
+                const novaEntrada = {
+                    id: Date.now(),
+                    colaborador: nomeColaborador,
+                    loja: nomeLoja,
+                    numeroNF: numeroNF,
+                    codigoCompleto: codigoBarras,
+                    dataHora: new Date().toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+                
+                notasFiscais.unshift(novaEntrada);
+                atualizarLista();
+                mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
+                salvarNoLocalStorage();
+                
+                // Para a câmera após leitura bem-sucedida
+                setTimeout(() => {
+                    pararCamera();
+                }, 1000);
+                
+                console.log('Nota fiscal salva:', novaEntrada);
+            } else if (numeroNF) {
+                // Se o código for válido mas dados incompletos
+                mostrarFeedback('❌ Dados incompletos', '#ef4444');
+            }
+            // Se o código não for válido (não for DANFE), apenas ignora silenciosamente
+        }
+
+        // Função para mostrar feedback visual
+        function mostrarFeedback(mensagem, cor) {
+            feedback.textContent = mensagem;
+            feedback.style.backgroundColor = cor;
+            feedback.style.display = 'block';
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 3000);
+        }
+
+        // Função para atualizar a lista de notas
+        function atualizarLista() {
+            contador.textContent = notasFiscais.length;
+            
+            if (notasFiscais.length === 0) {
+                listaNotas.innerHTML = '<p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>';
+                return;
+            }
+            
+            listaNotas.innerHTML = notasFiscais.map(nota => `
+                <div class="nota-card">
+                    <div class="nota-colaborador">${nota.colaborador}</div>
+                    <div class="nota-loja">${nota.loja}</div>
+                    <div class="nota-numero">NF: ${nota.numeroNF}</div>
+                    <div class="nota-data">${nota.dataHora}</div>
+                </div>
+            `).join('');
+        }
+
+        // Funções de LocalStorage
+        function salvarNoLocalStorage() {
+            localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
+        }
+
+        function carregarDoLocalStorage() {
+            const dados = localStorage.getItem('notasFiscais');
+            if (dados) {
+                notasFiscais = JSON.parse(dados);
+                atualizarLista();
+            }
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            carregarDoLocalStorage();
+            console.log('Sistema Scanner DANFE iniciado!');
+        });
+    </script>
+</body>
+</html>
