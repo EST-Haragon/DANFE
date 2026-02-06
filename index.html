@@ -119,26 +119,28 @@
             transform: translateY(-1px);
         }
 
-        .btn-success {
-            width: 100%;
-            padding: 12px;
-            background: #10b981;
-            color: white;
-            font-size: 15px;
-            margin-top: 8px;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-
         .camera-container {
             margin-bottom: 20px;
+            position: relative;
         }
 
-        #reader {
+        #interactive {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
             border: 2px solid #667eea;
+            position: relative;
+        }
+
+        #interactive video {
+            width: 100%;
+            display: block;
+        }
+
+        #interactive canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .camera-buttons {
@@ -262,25 +264,49 @@
         }
 
         .nota-numero {
-            font-size: 14px;
-            color: #667eea;
-            margin-bottom: 4px;
             font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nota-numero::before {
+            content: "📄";
+            font-size: 12px;
         }
 
         .nota-data {
-            font-size: 12px;
-            color: #9ca3af;
+            font-size: 13px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 20px;
-                margin: 10px;
-            }
+        .nota-data::before {
+            content: "🕒";
+            font-size: 12px;
+        }
 
-            h1 {
-                font-size: 24px;
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: scan 2s linear infinite;
+            z-index: 10;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+            100% {
+                top: 100%;
             }
         }
     </style>
@@ -320,7 +346,9 @@
 
         <!-- Área da Câmera -->
         <div id="cameraContainer" class="camera-container" style="display: none;">
-            <div id="reader" style="width: 100%; border-radius: 10px; overflow: hidden;"></div>
+            <div id="interactive">
+                <div class="scan-line"></div>
+            </div>
             <div class="camera-buttons">
                 <button id="btnFechar" class="btn-danger">Fechar Câmera</button>
             </div>
@@ -339,13 +367,13 @@
         </div>
     </div>
 
-    <!-- Biblioteca para leitura de código de barras -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <!-- Biblioteca QuaggaJS para leitura de código de barras -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
 
     <script>
         // Variáveis globais
         let notasFiscais = [];
-        let html5QrCode = null;
+        let scannerAtivo = false;
 
         // Elementos do DOM
         const inputNomeColaborador = document.getElementById('nomeColaborador');
@@ -374,64 +402,90 @@
         // Função para extrair número da nota fiscal do código de barras DANFE
         function extrairNumeroNF(codigoBarras) {
             if (codigoBarras && codigoBarras.length === 44) {
-                return codigoBarras.substring(27, 36);
+                return codigoBarras.substring(25, 34);
             }
             return null;
         }
 
         // Função para iniciar a câmera com leitor de código de barras
-        async function iniciarCamera() {
-            try {
-                html5QrCode = new Html5Qrcode("reader");
+        function iniciarCamera() {
+            cameraContainer.style.display = 'block';
+            btnEscanear.style.display = 'none';
+            scannerAtivo = true;
 
-                cameraContainer.style.display = 'block';
-                btnEscanear.style.display = 'none';
-
-                // Configurações para leitura de código de barras
-                const config = {
-                    fps: 10, // Frames por segundo
-                    qrbox: { width: 300, height: 150 }, // Área de leitura
-                    aspectRatio: 1.777778 // 16:9
-                };
-
-                // Iniciar escaneamento
-                await html5QrCode.start(
-                    { facingMode: "environment" }, // Câmera traseira
-                    config,
-                    (decodedText, decodedResult) => {
-                        // Callback quando código é detectado
-                        console.log('Código detectado:', decodedText);
-                        processarCodigo(decodedText);
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#interactive'),
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment" // Câmera traseira
                     },
-                    (errorMessage) => {
-                        // Callback de erro (opcional, pode ignorar)
-                        // Não precisa fazer nada aqui
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",  // Para Code 128
+                        "ean_reader",       // Para EAN-13
+                        "ean_8_reader",     // Para EAN-8
+                        "code_39_reader",   // Para Code 39
+                        "i2of5_reader"      // Para Interleaved 2 of 5
+                    ],
+                    debug: {
+                        showCanvas: true,
+                        showPatches: false,
+                        showFoundPatches: false,
+                        showSkeleton: false,
+                        showLabels: false,
+                        showPatchLabels: false,
+                        showRemainingPatchLabels: false,
+                        boxFromPatches: {
+                            showTransformed: true,
+                            showTransformedBox: true,
+                            showBB: true
+                        }
                     }
-                ).catch((err) => {
-                    console.error('Erro ao iniciar scanner:', err);
-                    alert('Erro ao iniciar o scanner: ' + err);
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 4,
+                frequency: 10,
+                locate: true
+            }, function(err) {
+                if (err) {
+                    console.error('Erro ao iniciar Quagga:', err);
+                    alert('Erro ao iniciar o scanner: ' + err.message + '\n\nVerifique se você deu permissão para usar a câmera.');
                     pararCamera();
-                });
+                    return;
+                }
+                console.log("Scanner iniciado com sucesso!");
+                Quagga.start();
+            });
 
-                console.log('Scanner iniciado com sucesso!');
+            // Listener para detectar códigos de barras
+            Quagga.onDetected(function(result) {
+                if (!scannerAtivo) return;
 
-            } catch (erro) {
-                console.error('Erro ao acessar câmera:', erro);
-                alert('Erro ao acessar a câmera: ' + erro.message + '\n\nVerifique se você deu permissão para usar a câmera.');
-                pararCamera();
-            }
+                const code = result.codeResult.code;
+                console.log('Código detectado:', code);
+                
+                // Processar apenas se for um código válido
+                if (code && code.length >= 44) {
+                    processarCodigo(code);
+                }
+            });
         }
 
         // Função para parar a câmera
-        async function pararCamera() {
-            if (html5QrCode) {
-                try {
-                    await html5QrCode.stop();
-                    html5QrCode.clear();
-                } catch (err) {
-                    console.error('Erro ao parar câmera:', err);
-                }
-                html5QrCode = null;
+        function pararCamera() {
+            scannerAtivo = false;
+            
+            if (typeof Quagga !== 'undefined') {
+                Quagga.stop();
+                Quagga.offDetected();
             }
 
             cameraContainer.style.display = 'none';
@@ -440,6 +494,8 @@
 
         // Função para processar código escaneado
         function processarCodigo(codigoBarras) {
+            if (!scannerAtivo) return;
+
             const numeroNF = extrairNumeroNF(codigoBarras);
             const nomeColaborador = inputNomeColaborador.value.trim();
             const nomeLoja = inputNomeLoja.value.trim();
@@ -480,11 +536,7 @@
                 }, 1000);
 
                 console.log('Nota fiscal salva:', novaEntrada);
-            } else if (numeroNF) {
-                // Se o código for válido mas dados incompletos
-                mostrarFeedback('❌ Dados incompletos', '#ef4444');
             }
-            // Se o código não for válido (não for DANFE), apenas ignora silenciosamente
         }
 
         // Função para mostrar feedback visual
@@ -533,7 +585,14 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             carregarDoLocalStorage();
-            console.log('Sistema Scanner DANFE iniciado!');
+            console.log('Sistema Scanner DANFE iniciado com QuaggaJS!');
+        });
+
+        // Limpar ao fechar a página
+        window.addEventListener('beforeunload', function() {
+            if (scannerAtivo) {
+                pararCamera();
+            }
         });
     </script>
 </body>
