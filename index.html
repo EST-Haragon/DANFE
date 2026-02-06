@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner DANFE - Debug</title>
+    <title>Scanner DANFE</title>
     <style>
         * {
             margin: 0;
@@ -73,6 +73,13 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
         button {
             font-family: inherit;
             cursor: pointer;
@@ -92,7 +99,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-size: 16px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .btn-primary:hover:not(:disabled) {
@@ -102,6 +109,27 @@
 
         .btn-primary:disabled {
             background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 16px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #f3f4f6;
+        }
+
+        .btn-secondary:disabled {
+            border-color: #9ca3af;
+            color: #9ca3af;
             cursor: not-allowed;
             opacity: 0.6;
         }
@@ -119,6 +147,25 @@
             transform: translateY(-1px);
         }
 
+        .btn-success {
+            width: 100%;
+            padding: 12px;
+            background: #10b981;
+            color: white;
+            font-size: 15px;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-success:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .camera-container {
             margin-bottom: 20px;
             position: relative;
@@ -130,6 +177,7 @@
             overflow: hidden;
             border: 2px solid #667eea;
             position: relative;
+            background: #000;
         }
 
         #interactive video {
@@ -161,39 +209,21 @@
             animation: slideDown 0.3s ease;
         }
 
-        /* DEBUG BOX */
-        .debug-box {
-            background: #1f2937;
-            color: #10b981;
-            padding: 12px;
+        .manual-input-section {
+            background: #f9fafb;
+            padding: 16px;
             border-radius: 10px;
             margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 200px;
-            overflow-y: auto;
+            border: 2px dashed #d1d5db;
         }
 
-        .debug-box .debug-line {
-            margin: 4px 0;
-            padding: 4px;
-            border-left: 3px solid #667eea;
-            padding-left: 8px;
-        }
-
-        .debug-box .debug-success {
-            color: #10b981;
-            border-left-color: #10b981;
-        }
-
-        .debug-box .debug-error {
-            color: #ef4444;
-            border-left-color: #ef4444;
-        }
-
-        .debug-box .debug-warning {
-            color: #f59e0b;
-            border-left-color: #f59e0b;
+        .manual-input-section h3 {
+            font-size: 16px;
+            color: #374151;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         @keyframes slideDown {
@@ -344,11 +374,32 @@
                 top: 100%;
             }
         }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #d1d5db;
+        }
+
+        .divider span {
+            padding: 0 10px;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Scanner DANFE - Debug</h1>
+        <h1>Scanner DANFE</h1>
 
         <!-- Input Nome do Colaborador -->
         <div class="form-group">
@@ -376,8 +427,40 @@
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
             </svg>
-            Escanear Código de Barras
+            Escanear com Câmera
         </button>
+
+        <!-- Divider -->
+        <div class="divider">
+            <span>OU</span>
+        </div>
+
+        <!-- Entrada Manual -->
+        <div class="manual-input-section">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Entrada Manual
+            </h3>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label for="chaveAcesso">Chave de Acesso (44 dígitos):</label>
+                <input 
+                    type="text" 
+                    id="chaveAcesso" 
+                    placeholder="Cole ou digite a chave de 44 dígitos"
+                    maxlength="44"
+                >
+                <small>Ex: 35210899999999999999550010000079611234567890</small>
+            </div>
+            <button id="btnSalvarManual" class="btn-success" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Salvar Nota Fiscal
+            </button>
+        </div>
 
         <!-- Área da Câmera -->
         <div id="cameraContainer" class="camera-container" style="display: none;">
@@ -387,12 +470,6 @@
             <div class="camera-buttons">
                 <button id="btnFechar" class="btn-danger">Fechar Câmera</button>
             </div>
-        </div>
-
-        <!-- DEBUG BOX -->
-        <div id="debugBox" class="debug-box" style="display: none;">
-            <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">📊 LOG DE DEBUG:</div>
-            <div id="debugContent"></div>
         </div>
 
         <!-- Feedback de Scan -->
@@ -421,62 +498,59 @@
         // Elementos do DOM
         const inputNomeColaborador = document.getElementById('nomeColaborador');
         const inputNomeLoja = document.getElementById('nomeLoja');
+        const inputChaveAcesso = document.getElementById('chaveAcesso');
         const btnEscanear = document.getElementById('btnEscanear');
+        const btnSalvarManual = document.getElementById('btnSalvarManual');
         const btnFechar = document.getElementById('btnFechar');
         const cameraContainer = document.getElementById('cameraContainer');
         const feedback = document.getElementById('feedback');
         const listaNotas = document.getElementById('listaNotas');
         const contador = document.getElementById('contador');
-        const debugBox = document.getElementById('debugBox');
-        const debugContent = document.getElementById('debugContent');
 
         // Event Listeners
         inputNomeColaborador.addEventListener('input', validarCampos);
         inputNomeLoja.addEventListener('input', validarCampos);
+        inputChaveAcesso.addEventListener('input', validarEntradaManual);
 
         btnEscanear.addEventListener('click', iniciarCamera);
+        btnSalvarManual.addEventListener('click', salvarManual);
         btnFechar.addEventListener('click', pararCamera);
-
-        // Função para adicionar log de debug
-        function addDebugLog(mensagem, tipo = 'info') {
-            const agora = new Date().toLocaleTimeString('pt-BR');
-            const classeCSS = tipo === 'success' ? 'debug-success' : 
-                             tipo === 'error' ? 'debug-error' : 
-                             tipo === 'warning' ? 'debug-warning' : '';
-            
-            const linha = document.createElement('div');
-            linha.className = `debug-line ${classeCSS}`;
-            linha.textContent = `[${agora}] ${mensagem}`;
-            
-            debugContent.insertBefore(linha, debugContent.firstChild);
-            
-            // Limitar a 50 linhas
-            while (debugContent.children.length > 50) {
-                debugContent.removeChild(debugContent.lastChild);
-            }
-            
-            console.log(`[${agora}] ${mensagem}`);
-        }
 
         // Função para validar se ambos os campos estão preenchidos
         function validarCampos() {
             const colaboradorPreenchido = inputNomeColaborador.value.trim();
             const lojaPreenchida = inputNomeLoja.value.trim();
-            btnEscanear.disabled = !(colaboradorPreenchido && lojaPreenchida);
+            const camposOk = colaboradorPreenchido && lojaPreenchida;
+            
+            btnEscanear.disabled = !camposOk;
+            validarEntradaManual();
+        }
+
+        // Função para validar entrada manual
+        function validarEntradaManual() {
+            const colaboradorPreenchido = inputNomeColaborador.value.trim();
+            const lojaPreenchida = inputNomeLoja.value.trim();
+            const chavePreenchida = inputChaveAcesso.value.trim();
+            
+            btnSalvarManual.disabled = !(colaboradorPreenchido && lojaPreenchida && chavePreenchida.length === 44);
+        }
+
+        // Função para salvar manualmente
+        function salvarManual() {
+            const chave = inputChaveAcesso.value.trim();
+            if (chave.length === 44) {
+                processarCodigo(chave);
+                inputChaveAcesso.value = '';
+                validarEntradaManual();
+            }
         }
 
         // Função para extrair número da nota fiscal do código de barras DANFE
         function extrairNumeroNF(codigoBarras) {
-            addDebugLog(`Tentando extrair NF de código com ${codigoBarras.length} dígitos`, 'info');
-            
             if (codigoBarras && codigoBarras.length === 44) {
-                // Posição correta: caracteres 25 a 33 (9 dígitos)
-                const numeroNF = codigoBarras.substring(25, 34);
-                addDebugLog(`✓ NF extraída: ${numeroNF}`, 'success');
-                return numeroNF;
+                // A posição correta do número da NF na chave de acesso é do caractere 25 ao 33
+                return codigoBarras.substring(25, 34);
             }
-            
-            addDebugLog(`✗ Código inválido (precisa ter 44 dígitos)`, 'error');
             return null;
         }
 
@@ -484,10 +558,7 @@
         function iniciarCamera() {
             cameraContainer.style.display = 'block';
             btnEscanear.style.display = 'none';
-            debugBox.style.display = 'block';
             scannerAtivo = true;
-
-            addDebugLog('🎥 Iniciando câmera...', 'info');
 
             Quagga.init({
                 inputStream: {
@@ -495,8 +566,8 @@
                     type: "LiveStream",
                     target: document.querySelector('#interactive'),
                     constraints: {
-                        width: 640,
-                        height: 480,
+                        width: 1280,
+                        height: 720,
                         facingMode: "environment"
                     },
                 },
@@ -509,19 +580,24 @@
                         "code_93_reader",
                         "i2of5_reader",
                         "codabar_reader"
-                    ]
+                    ],
+                    multiple: false
                 },
                 locate: true,
-                numOfWorkers: 4,
-                frequency: 10
+                numOfWorkers: navigator.hardwareConcurrency || 4,
+                frequency: 10,
+                locator: {
+                    patchSize: "large",
+                    halfSample: false
+                }
             }, function(err) {
                 if (err) {
-                    addDebugLog(`✗ Erro: ${err.message}`, 'error');
-                    alert('Erro ao iniciar o scanner: ' + err.message + '\n\nVerifique se você deu permissão para usar a câmera.');
+                    console.error('Erro ao iniciar Quagga:', err);
+                    alert('Erro ao iniciar o scanner: ' + err.message);
                     pararCamera();
                     return;
                 }
-                addDebugLog('✓ Scanner iniciado!', 'success');
+                console.log("Scanner iniciado!");
                 Quagga.start();
             });
 
@@ -530,14 +606,10 @@
                 if (!scannerAtivo) return;
 
                 const code = result.codeResult.code;
-                const format = result.codeResult.format;
+                console.log('Código detectado:', code, 'Tamanho:', code.length);
                 
-                addDebugLog(`📷 Código detectado: ${code} (${format})`, 'info');
-                addDebugLog(`   Tamanho: ${code.length} caracteres`, 'info');
-                
-                // Evitar processar o mesmo código múltiplas vezes rapidamente
+                // Evitar processar o mesmo código múltiplas vezes
                 if (code === ultimoCodigoLido) {
-                    addDebugLog(`⏭️ Código duplicado, ignorando...`, 'warning');
                     return;
                 }
                 
@@ -545,20 +617,11 @@
                 clearTimeout(timeoutUltimoCodigo);
                 timeoutUltimoCodigo = setTimeout(() => {
                     ultimoCodigoLido = null;
-                }, 2000);
+                }, 3000);
                 
-                // Processar código
-                processarCodigo(code);
-            });
-
-            // Listener para processos (debug)
-            Quagga.onProcessed(function(result) {
-                if (result && result.codeResult) {
-                    // Código parcialmente detectado
-                    const code = result.codeResult.code;
-                    if (code && code.length > 10) {
-                        addDebugLog(`🔍 Detectando: ${code.substring(0, 20)}...`, 'info');
-                    }
+                // Processar código se tiver 44 dígitos
+                if (code && code.length === 44) {
+                    processarCodigo(code);
                 }
             });
         }
@@ -570,8 +633,6 @@
             if (typeof Quagga !== 'undefined') {
                 Quagga.stop();
                 Quagga.offDetected();
-                Quagga.offProcessed();
-                addDebugLog('⏹️ Scanner parado', 'info');
             }
 
             cameraContainer.style.display = 'none';
@@ -580,22 +641,18 @@
 
         // Função para processar código escaneado
         function processarCodigo(codigoBarras) {
-            if (!scannerAtivo) return;
-
-            addDebugLog(`⚙️ Processando código: ${codigoBarras}`, 'info');
+            console.log('Processando código:', codigoBarras);
 
             const numeroNF = extrairNumeroNF(codigoBarras);
             const nomeColaborador = inputNomeColaborador.value.trim();
             const nomeLoja = inputNomeLoja.value.trim();
 
             if (!numeroNF) {
-                addDebugLog('✗ Não foi possível extrair número da NF', 'error');
-                mostrarFeedback('❌ Código inválido (não é um DANFE de 44 dígitos)', '#ef4444');
+                mostrarFeedback('❌ Código inválido (precisa ter 44 dígitos)', '#ef4444');
                 return;
             }
 
             if (!nomeColaborador || !nomeLoja) {
-                addDebugLog('✗ Dados incompletos (colaborador ou loja vazio)', 'error');
                 mostrarFeedback('❌ Preencha colaborador e loja', '#ef4444');
                 return;
             }
@@ -605,7 +662,6 @@
             );
 
             if (jaExiste) {
-                addDebugLog(`⚠️ NF ${numeroNF} já existe na lista`, 'warning');
                 mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
                 return;
             }
@@ -627,14 +683,17 @@
 
             notasFiscais.unshift(novaEntrada);
             atualizarLista();
-            addDebugLog(`✓ NF ${numeroNF} salva com sucesso!`, 'success');
             mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
             salvarNoLocalStorage();
 
-            // Para a câmera após leitura bem-sucedida
-            setTimeout(() => {
-                pararCamera();
-            }, 1500);
+            // Para a câmera se estiver ativa
+            if (scannerAtivo) {
+                setTimeout(() => {
+                    pararCamera();
+                }, 1500);
+            }
+
+            console.log('Nota fiscal salva:', novaEntrada);
         }
 
         // Função para mostrar feedback visual
@@ -670,7 +729,6 @@
         // Funções de LocalStorage
         function salvarNoLocalStorage() {
             localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
-            addDebugLog('💾 Dados salvos no localStorage', 'success');
         }
 
         function carregarDoLocalStorage() {
@@ -678,14 +736,13 @@
             if (dados) {
                 notasFiscais = JSON.parse(dados);
                 atualizarLista();
-                addDebugLog(`📂 ${notasFiscais.length} notas carregadas do localStorage`, 'success');
             }
         }
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             carregarDoLocalStorage();
-            addDebugLog('🚀 Sistema iniciado!', 'success');
+            console.log('Sistema iniciado!');
         });
 
         // Limpar ao fechar a página
