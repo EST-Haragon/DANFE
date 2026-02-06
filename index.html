@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner DANFE</title>
+    <title>Scanner DANFE - Debug</title>
     <style>
         * {
             margin: 0;
@@ -161,6 +161,41 @@
             animation: slideDown 0.3s ease;
         }
 
+        /* DEBUG BOX */
+        .debug-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-box .debug-line {
+            margin: 4px 0;
+            padding: 4px;
+            border-left: 3px solid #667eea;
+            padding-left: 8px;
+        }
+
+        .debug-box .debug-success {
+            color: #10b981;
+            border-left-color: #10b981;
+        }
+
+        .debug-box .debug-error {
+            color: #ef4444;
+            border-left-color: #ef4444;
+        }
+
+        .debug-box .debug-warning {
+            color: #f59e0b;
+            border-left-color: #f59e0b;
+        }
+
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -313,7 +348,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Scanner DANFE</h1>
+        <h1>Scanner DANFE - Debug</h1>
 
         <!-- Input Nome do Colaborador -->
         <div class="form-group">
@@ -354,6 +389,12 @@
             </div>
         </div>
 
+        <!-- DEBUG BOX -->
+        <div id="debugBox" class="debug-box" style="display: none;">
+            <div style="color: #fff; font-weight: bold; margin-bottom: 8px;">📊 LOG DE DEBUG:</div>
+            <div id="debugContent"></div>
+        </div>
+
         <!-- Feedback de Scan -->
         <div id="feedback" class="feedback" style="display: none;"></div>
 
@@ -374,6 +415,8 @@
         // Variáveis globais
         let notasFiscais = [];
         let scannerAtivo = false;
+        let ultimoCodigoLido = null;
+        let timeoutUltimoCodigo = null;
 
         // Elementos do DOM
         const inputNomeColaborador = document.getElementById('nomeColaborador');
@@ -384,6 +427,8 @@
         const feedback = document.getElementById('feedback');
         const listaNotas = document.getElementById('listaNotas');
         const contador = document.getElementById('contador');
+        const debugBox = document.getElementById('debugBox');
+        const debugContent = document.getElementById('debugContent');
 
         // Event Listeners
         inputNomeColaborador.addEventListener('input', validarCampos);
@@ -391,6 +436,27 @@
 
         btnEscanear.addEventListener('click', iniciarCamera);
         btnFechar.addEventListener('click', pararCamera);
+
+        // Função para adicionar log de debug
+        function addDebugLog(mensagem, tipo = 'info') {
+            const agora = new Date().toLocaleTimeString('pt-BR');
+            const classeCSS = tipo === 'success' ? 'debug-success' : 
+                             tipo === 'error' ? 'debug-error' : 
+                             tipo === 'warning' ? 'debug-warning' : '';
+            
+            const linha = document.createElement('div');
+            linha.className = `debug-line ${classeCSS}`;
+            linha.textContent = `[${agora}] ${mensagem}`;
+            
+            debugContent.insertBefore(linha, debugContent.firstChild);
+            
+            // Limitar a 50 linhas
+            while (debugContent.children.length > 50) {
+                debugContent.removeChild(debugContent.lastChild);
+            }
+            
+            console.log(`[${agora}] ${mensagem}`);
+        }
 
         // Função para validar se ambos os campos estão preenchidos
         function validarCampos() {
@@ -401,9 +467,16 @@
 
         // Função para extrair número da nota fiscal do código de barras DANFE
         function extrairNumeroNF(codigoBarras) {
+            addDebugLog(`Tentando extrair NF de código com ${codigoBarras.length} dígitos`, 'info');
+            
             if (codigoBarras && codigoBarras.length === 44) {
-                return codigoBarras.substring(25, 34);
+                // Posição correta: caracteres 25 a 33 (9 dígitos)
+                const numeroNF = codigoBarras.substring(25, 34);
+                addDebugLog(`✓ NF extraída: ${numeroNF}`, 'success');
+                return numeroNF;
             }
+            
+            addDebugLog(`✗ Código inválido (precisa ter 44 dígitos)`, 'error');
             return null;
         }
 
@@ -411,7 +484,10 @@
         function iniciarCamera() {
             cameraContainer.style.display = 'block';
             btnEscanear.style.display = 'none';
+            debugBox.style.display = 'block';
             scannerAtivo = true;
+
+            addDebugLog('🎥 Iniciando câmera...', 'info');
 
             Quagga.init({
                 inputStream: {
@@ -421,47 +497,31 @@
                     constraints: {
                         width: 640,
                         height: 480,
-                        facingMode: "environment" // Câmera traseira
+                        facingMode: "environment"
                     },
                 },
                 decoder: {
                     readers: [
-                        "code_128_reader",  // Para Code 128
-                        "ean_reader",       // Para EAN-13
-                        "ean_8_reader",     // Para EAN-8
-                        "code_39_reader",   // Para Code 39
-                        "i2of5_reader"      // Para Interleaved 2 of 5
-                    ],
-                    debug: {
-                        showCanvas: true,
-                        showPatches: false,
-                        showFoundPatches: false,
-                        showSkeleton: false,
-                        showLabels: false,
-                        showPatchLabels: false,
-                        showRemainingPatchLabels: false,
-                        boxFromPatches: {
-                            showTransformed: true,
-                            showTransformedBox: true,
-                            showBB: true
-                        }
-                    }
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_93_reader",
+                        "i2of5_reader",
+                        "codabar_reader"
+                    ]
                 },
-                locator: {
-                    patchSize: "medium",
-                    halfSample: true
-                },
+                locate: true,
                 numOfWorkers: 4,
-                frequency: 10,
-                locate: true
+                frequency: 10
             }, function(err) {
                 if (err) {
-                    console.error('Erro ao iniciar Quagga:', err);
+                    addDebugLog(`✗ Erro: ${err.message}`, 'error');
                     alert('Erro ao iniciar o scanner: ' + err.message + '\n\nVerifique se você deu permissão para usar a câmera.');
                     pararCamera();
                     return;
                 }
-                console.log("Scanner iniciado com sucesso!");
+                addDebugLog('✓ Scanner iniciado!', 'success');
                 Quagga.start();
             });
 
@@ -470,11 +530,35 @@
                 if (!scannerAtivo) return;
 
                 const code = result.codeResult.code;
-                console.log('Código detectado:', code);
+                const format = result.codeResult.format;
                 
-                // Processar apenas se for um código válido
-                if (code && code.length >= 44) {
-                    processarCodigo(code);
+                addDebugLog(`📷 Código detectado: ${code} (${format})`, 'info');
+                addDebugLog(`   Tamanho: ${code.length} caracteres`, 'info');
+                
+                // Evitar processar o mesmo código múltiplas vezes rapidamente
+                if (code === ultimoCodigoLido) {
+                    addDebugLog(`⏭️ Código duplicado, ignorando...`, 'warning');
+                    return;
+                }
+                
+                ultimoCodigoLido = code;
+                clearTimeout(timeoutUltimoCodigo);
+                timeoutUltimoCodigo = setTimeout(() => {
+                    ultimoCodigoLido = null;
+                }, 2000);
+                
+                // Processar código
+                processarCodigo(code);
+            });
+
+            // Listener para processos (debug)
+            Quagga.onProcessed(function(result) {
+                if (result && result.codeResult) {
+                    // Código parcialmente detectado
+                    const code = result.codeResult.code;
+                    if (code && code.length > 10) {
+                        addDebugLog(`🔍 Detectando: ${code.substring(0, 20)}...`, 'info');
+                    }
                 }
             });
         }
@@ -486,6 +570,8 @@
             if (typeof Quagga !== 'undefined') {
                 Quagga.stop();
                 Quagga.offDetected();
+                Quagga.offProcessed();
+                addDebugLog('⏹️ Scanner parado', 'info');
             }
 
             cameraContainer.style.display = 'none';
@@ -496,47 +582,59 @@
         function processarCodigo(codigoBarras) {
             if (!scannerAtivo) return;
 
+            addDebugLog(`⚙️ Processando código: ${codigoBarras}`, 'info');
+
             const numeroNF = extrairNumeroNF(codigoBarras);
             const nomeColaborador = inputNomeColaborador.value.trim();
             const nomeLoja = inputNomeLoja.value.trim();
 
-            if (numeroNF && nomeColaborador && nomeLoja) {
-                const jaExiste = notasFiscais.some(
-                    nota => nota.numeroNF === numeroNF && nota.loja === nomeLoja && nota.colaborador === nomeColaborador
-                );
-
-                if (jaExiste) {
-                    mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
-                    return;
-                }
-
-                const novaEntrada = {
-                    id: Date.now(),
-                    colaborador: nomeColaborador,
-                    loja: nomeLoja,
-                    numeroNF: numeroNF,
-                    codigoCompleto: codigoBarras,
-                    dataHora: new Date().toLocaleString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })
-                };
-
-                notasFiscais.unshift(novaEntrada);
-                atualizarLista();
-                mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
-                salvarNoLocalStorage();
-
-                // Para a câmera após leitura bem-sucedida
-                setTimeout(() => {
-                    pararCamera();
-                }, 1000);
-
-                console.log('Nota fiscal salva:', novaEntrada);
+            if (!numeroNF) {
+                addDebugLog('✗ Não foi possível extrair número da NF', 'error');
+                mostrarFeedback('❌ Código inválido (não é um DANFE de 44 dígitos)', '#ef4444');
+                return;
             }
+
+            if (!nomeColaborador || !nomeLoja) {
+                addDebugLog('✗ Dados incompletos (colaborador ou loja vazio)', 'error');
+                mostrarFeedback('❌ Preencha colaborador e loja', '#ef4444');
+                return;
+            }
+
+            const jaExiste = notasFiscais.some(
+                nota => nota.numeroNF === numeroNF && nota.loja === nomeLoja && nota.colaborador === nomeColaborador
+            );
+
+            if (jaExiste) {
+                addDebugLog(`⚠️ NF ${numeroNF} já existe na lista`, 'warning');
+                mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
+                return;
+            }
+
+            const novaEntrada = {
+                id: Date.now(),
+                colaborador: nomeColaborador,
+                loja: nomeLoja,
+                numeroNF: numeroNF,
+                codigoCompleto: codigoBarras,
+                dataHora: new Date().toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            notasFiscais.unshift(novaEntrada);
+            atualizarLista();
+            addDebugLog(`✓ NF ${numeroNF} salva com sucesso!`, 'success');
+            mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
+            salvarNoLocalStorage();
+
+            // Para a câmera após leitura bem-sucedida
+            setTimeout(() => {
+                pararCamera();
+            }, 1500);
         }
 
         // Função para mostrar feedback visual
@@ -572,6 +670,7 @@
         // Funções de LocalStorage
         function salvarNoLocalStorage() {
             localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
+            addDebugLog('💾 Dados salvos no localStorage', 'success');
         }
 
         function carregarDoLocalStorage() {
@@ -579,13 +678,14 @@
             if (dados) {
                 notasFiscais = JSON.parse(dados);
                 atualizarLista();
+                addDebugLog(`📂 ${notasFiscais.length} notas carregadas do localStorage`, 'success');
             }
         }
 
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             carregarDoLocalStorage();
-            console.log('Sistema Scanner DANFE iniciado com QuaggaJS!');
+            addDebugLog('🚀 Sistema iniciado!', 'success');
         });
 
         // Limpar ao fechar a página
