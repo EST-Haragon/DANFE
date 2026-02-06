@@ -73,13 +73,6 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .form-group small {
-            display: block;
-            margin-top: 6px;
-            color: #6b7280;
-            font-size: 12px;
-        }
-
         button {
             font-family: inherit;
             cursor: pointer;
@@ -99,7 +92,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-size: 16px;
-            margin-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .btn-primary:hover:not(:disabled) {
@@ -109,27 +102,6 @@
 
         .btn-primary:disabled {
             background: #9ca3af;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 16px;
-            background: white;
-            border: 2px solid #667eea;
-            color: #667eea;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: #f3f4f6;
-        }
-
-        .btn-secondary:disabled {
-            border-color: #9ca3af;
-            color: #9ca3af;
             cursor: not-allowed;
             opacity: 0.6;
         }
@@ -147,48 +119,67 @@
             transform: translateY(-1px);
         }
 
-        .btn-success {
-            width: 100%;
-            padding: 12px;
-            background: #10b981;
-            color: white;
-            font-size: 15px;
-        }
-
-        .btn-success:hover:not(:disabled) {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-
-        .btn-success:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
         .camera-container {
             margin-bottom: 20px;
             position: relative;
         }
 
-        #interactive {
+        #video {
             width: 100%;
             border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid #667eea;
-            position: relative;
+            border: 3px solid #667eea;
+            display: block;
             background: #000;
         }
 
-        #interactive video {
-            width: 100%;
-            display: block;
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 40%;
+            border: 3px solid #10b981;
+            border-radius: 10px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            pointer-events: none;
         }
 
-        #interactive canvas {
+        .camera-overlay::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
+            right: 0;
+            height: 2px;
+            background: #10b981;
+            animation: scan 2s linear infinite;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        @keyframes scan {
+            0%, 100% {
+                top: 0;
+            }
+            50% {
+                top: 100%;
+            }
+        }
+
+        .camera-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin: 0 10px;
         }
 
         .camera-buttons {
@@ -209,23 +200,6 @@
             animation: slideDown 0.3s ease;
         }
 
-        .manual-input-section {
-            background: #f9fafb;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 2px dashed #d1d5db;
-        }
-
-        .manual-input-section h3 {
-            font-size: 16px;
-            color: #374151;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -235,6 +209,25 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-searching {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-detected {
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .notas-section {
@@ -259,10 +252,6 @@
         .lista-notas::-webkit-scrollbar-thumb {
             background: #667eea;
             border-radius: 10px;
-        }
-
-        .lista-notas::-webkit-scrollbar-thumb:hover {
-            background: #764ba2;
         }
 
         .empty-state {
@@ -355,46 +344,6 @@
             content: "🕒";
             font-size: 12px;
         }
-
-        .scan-line {
-            position: absolute;
-            width: 100%;
-            height: 2px;
-            background: #10b981;
-            box-shadow: 0 0 10px #10b981;
-            animation: scan 2s linear infinite;
-            z-index: 10;
-        }
-
-        @keyframes scan {
-            0% {
-                top: 0;
-            }
-            100% {
-                top: 100%;
-            }
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid #d1d5db;
-        }
-
-        .divider span {
-            padding: 0 10px;
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
-        }
     </style>
 </head>
 <body>
@@ -427,45 +376,17 @@
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
             </svg>
-            Escanear com Câmera
+            Escanear Código de Barras
         </button>
-
-        <!-- Divider -->
-        <div class="divider">
-            <span>OU</span>
-        </div>
-
-        <!-- Entrada Manual -->
-        <div class="manual-input-section">
-            <h3>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Entrada Manual
-            </h3>
-            <div class="form-group" style="margin-bottom: 12px;">
-                <label for="chaveAcesso">Chave de Acesso (44 dígitos):</label>
-                <input 
-                    type="text" 
-                    id="chaveAcesso" 
-                    placeholder="Cole ou digite a chave de 44 dígitos"
-                    maxlength="44"
-                >
-                <small>Ex: 35210899999999999999550010000079611234567890</small>
-            </div>
-            <button id="btnSalvarManual" class="btn-success" disabled>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                Salvar Nota Fiscal
-            </button>
-        </div>
 
         <!-- Área da Câmera -->
         <div id="cameraContainer" class="camera-container" style="display: none;">
-            <div id="interactive">
-                <div class="scan-line"></div>
+            <div style="position: relative;">
+                <video id="video" playsinline autoplay></video>
+                <div class="camera-overlay"></div>
+                <div class="camera-hint">
+                    <span id="statusText" class="status-badge status-searching">🔍 Procurando código...</span>
+                </div>
             </div>
             <div class="camera-buttons">
                 <button id="btnFechar" class="btn-danger">Fechar Câmera</button>
@@ -485,12 +406,11 @@
         </div>
     </div>
 
-    <!-- Biblioteca QuaggaJS para leitura de código de barras -->
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
-
     <script>
         // Variáveis globais
         let notasFiscais = [];
+        let stream = null;
+        let barcodeDetector = null;
         let scannerAtivo = false;
         let ultimoCodigoLido = null;
         let timeoutUltimoCodigo = null;
@@ -498,143 +418,142 @@
         // Elementos do DOM
         const inputNomeColaborador = document.getElementById('nomeColaborador');
         const inputNomeLoja = document.getElementById('nomeLoja');
-        const inputChaveAcesso = document.getElementById('chaveAcesso');
         const btnEscanear = document.getElementById('btnEscanear');
-        const btnSalvarManual = document.getElementById('btnSalvarManual');
         const btnFechar = document.getElementById('btnFechar');
         const cameraContainer = document.getElementById('cameraContainer');
+        const video = document.getElementById('video');
         const feedback = document.getElementById('feedback');
         const listaNotas = document.getElementById('listaNotas');
         const contador = document.getElementById('contador');
+        const statusText = document.getElementById('statusText');
 
         // Event Listeners
         inputNomeColaborador.addEventListener('input', validarCampos);
         inputNomeLoja.addEventListener('input', validarCampos);
-        inputChaveAcesso.addEventListener('input', validarEntradaManual);
 
         btnEscanear.addEventListener('click', iniciarCamera);
-        btnSalvarManual.addEventListener('click', salvarManual);
         btnFechar.addEventListener('click', pararCamera);
 
         // Função para validar se ambos os campos estão preenchidos
         function validarCampos() {
             const colaboradorPreenchido = inputNomeColaborador.value.trim();
             const lojaPreenchida = inputNomeLoja.value.trim();
-            const camposOk = colaboradorPreenchido && lojaPreenchida;
-            
-            btnEscanear.disabled = !camposOk;
-            validarEntradaManual();
-        }
-
-        // Função para validar entrada manual
-        function validarEntradaManual() {
-            const colaboradorPreenchido = inputNomeColaborador.value.trim();
-            const lojaPreenchida = inputNomeLoja.value.trim();
-            const chavePreenchida = inputChaveAcesso.value.trim();
-            
-            btnSalvarManual.disabled = !(colaboradorPreenchido && lojaPreenchida && chavePreenchida.length === 44);
-        }
-
-        // Função para salvar manualmente
-        function salvarManual() {
-            const chave = inputChaveAcesso.value.trim();
-            if (chave.length === 44) {
-                processarCodigo(chave);
-                inputChaveAcesso.value = '';
-                validarEntradaManual();
-            }
+            btnEscanear.disabled = !(colaboradorPreenchido && lojaPreenchida);
         }
 
         // Função para extrair número da nota fiscal do código de barras DANFE
         function extrairNumeroNF(codigoBarras) {
             if (codigoBarras && codigoBarras.length === 44) {
-                // A posição correta do número da NF na chave de acesso é do caractere 25 ao 33
                 return codigoBarras.substring(25, 34);
             }
             return null;
         }
 
-        // Função para iniciar a câmera com leitor de código de barras
-        function iniciarCamera() {
-            cameraContainer.style.display = 'block';
-            btnEscanear.style.display = 'none';
-            scannerAtivo = true;
+        // Função para detectar códigos de barras continuamente
+        async function detectarCodigos() {
+            if (!scannerAtivo || !barcodeDetector) return;
 
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector('#interactive'),
-                    constraints: {
-                        width: 1280,
-                        height: 720,
-                        facingMode: "environment"
-                    },
-                },
-                decoder: {
-                    readers: [
-                        "code_128_reader",
-                        "ean_reader",
-                        "ean_8_reader",
-                        "code_39_reader",
-                        "code_93_reader",
-                        "i2of5_reader",
-                        "codabar_reader"
-                    ],
-                    multiple: false
-                },
-                locate: true,
-                numOfWorkers: navigator.hardwareConcurrency || 4,
-                frequency: 10,
-                locator: {
-                    patchSize: "large",
-                    halfSample: false
+            try {
+                const barcodes = await barcodeDetector.detect(video);
+                
+                if (barcodes.length > 0) {
+                    for (const barcode of barcodes) {
+                        const codigo = barcode.rawValue;
+                        console.log('Código detectado:', codigo, 'Tamanho:', codigo.length, 'Formato:', barcode.format);
+                        
+                        // Atualizar status
+                        statusText.textContent = `📷 Código: ${codigo.substring(0, 12)}... (${codigo.length} dígitos)`;
+                        statusText.className = 'status-badge status-detected';
+                        
+                        // Se for um código de 44 dígitos, processar
+                        if (codigo.length === 44) {
+                            // Evitar processar o mesmo código múltiplas vezes
+                            if (codigo === ultimoCodigoLido) {
+                                continue;
+                            }
+                            
+                            ultimoCodigoLido = codigo;
+                            clearTimeout(timeoutUltimoCodigo);
+                            timeoutUltimoCodigo = setTimeout(() => {
+                                ultimoCodigoLido = null;
+                            }, 3000);
+                            
+                            processarCodigo(codigo);
+                            return; // Para a detecção após encontrar um código válido
+                        }
+                    }
                 }
-            }, function(err) {
-                if (err) {
-                    console.error('Erro ao iniciar Quagga:', err);
-                    alert('Erro ao iniciar o scanner: ' + err.message);
-                    pararCamera();
+                
+                // Continuar detectando
+                if (scannerAtivo) {
+                    requestAnimationFrame(detectarCodigos);
+                }
+            } catch (error) {
+                console.error('Erro ao detectar código:', error);
+                if (scannerAtivo) {
+                    requestAnimationFrame(detectarCodigos);
+                }
+            }
+        }
+
+        // Função para iniciar a câmera
+        async function iniciarCamera() {
+            try {
+                // Verificar se o navegador suporta BarcodeDetector
+                if (!('BarcodeDetector' in window)) {
+                    alert('⚠️ Seu navegador não suporta detecção nativa de código de barras.\n\nPor favor, use o Google Chrome ou Edge no Android.\n\nSe estiver no iPhone, infelizmente o Safari não suporta esta funcionalidade ainda.');
                     return;
                 }
-                console.log("Scanner iniciado!");
-                Quagga.start();
-            });
 
-            // Listener para detectar códigos de barras
-            Quagga.onDetected(function(result) {
-                if (!scannerAtivo) return;
+                // Criar detector de código de barras
+                const formats = await BarcodeDetector.getSupportedFormats();
+                console.log('Formatos suportados:', formats);
+                
+                barcodeDetector = new BarcodeDetector({
+                    formats: formats
+                });
 
-                const code = result.codeResult.code;
-                console.log('Código detectado:', code, 'Tamanho:', code.length);
+                // Iniciar câmera
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+
+                video.srcObject = stream;
+                cameraContainer.style.display = 'block';
+                btnEscanear.style.display = 'none';
+                scannerAtivo = true;
+
+                // Aguardar vídeo carregar
+                await video.play();
+
+                console.log('Câmera iniciada! Começando detecção...');
+                statusText.textContent = '🔍 Procurando código...';
+                statusText.className = 'status-badge status-searching';
                 
-                // Evitar processar o mesmo código múltiplas vezes
-                if (code === ultimoCodigoLido) {
-                    return;
-                }
-                
-                ultimoCodigoLido = code;
-                clearTimeout(timeoutUltimoCodigo);
-                timeoutUltimoCodigo = setTimeout(() => {
-                    ultimoCodigoLido = null;
-                }, 3000);
-                
-                // Processar código se tiver 44 dígitos
-                if (code && code.length === 44) {
-                    processarCodigo(code);
-                }
-            });
+                // Iniciar detecção
+                detectarCodigos();
+
+            } catch (error) {
+                console.error('Erro ao iniciar câmera:', error);
+                alert('Erro ao acessar a câmera: ' + error.message + '\n\nVerifique se você deu permissão para usar a câmera.');
+                pararCamera();
+            }
         }
 
         // Função para parar a câmera
         function pararCamera() {
             scannerAtivo = false;
             
-            if (typeof Quagga !== 'undefined') {
-                Quagga.stop();
-                Quagga.offDetected();
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
             }
 
+            video.srcObject = null;
             cameraContainer.style.display = 'none';
             btnEscanear.style.display = 'flex';
         }
@@ -648,7 +567,15 @@
             const nomeLoja = inputNomeLoja.value.trim();
 
             if (!numeroNF) {
-                mostrarFeedback('❌ Código inválido (precisa ter 44 dígitos)', '#ef4444');
+                mostrarFeedback('❌ Código inválido (não é DANFE de 44 dígitos)', '#ef4444');
+                statusText.textContent = '❌ Código inválido';
+                statusText.className = 'status-badge status-searching';
+                setTimeout(() => {
+                    if (scannerAtivo) {
+                        statusText.textContent = '🔍 Procurando código...';
+                        detectarCodigos();
+                    }
+                }, 2000);
                 return;
             }
 
@@ -663,6 +590,13 @@
 
             if (jaExiste) {
                 mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
+                statusText.textContent = '⚠️ Já escaneada';
+                setTimeout(() => {
+                    if (scannerAtivo) {
+                        statusText.textContent = '🔍 Procurando código...';
+                        detectarCodigos();
+                    }
+                }, 2000);
                 return;
             }
 
@@ -686,12 +620,10 @@
             mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
             salvarNoLocalStorage();
 
-            // Para a câmera se estiver ativa
-            if (scannerAtivo) {
-                setTimeout(() => {
-                    pararCamera();
-                }, 1500);
-            }
+            // Para a câmera após leitura bem-sucedida
+            setTimeout(() => {
+                pararCamera();
+            }, 1500);
 
             console.log('Nota fiscal salva:', novaEntrada);
         }
@@ -742,7 +674,14 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             carregarDoLocalStorage();
-            console.log('Sistema iniciado!');
+            console.log('Sistema Scanner DANFE iniciado!');
+            
+            // Verificar suporte
+            if ('BarcodeDetector' in window) {
+                console.log('✓ BarcodeDetector suportado!');
+            } else {
+                console.warn('✗ BarcodeDetector NÃO suportado neste navegador');
+            }
         });
 
         // Limpar ao fechar a página
