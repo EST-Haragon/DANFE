@@ -114,9 +114,44 @@
             font-size: 15px;
         }
 
-        .btn-danger:hover {
+        .btn-danger:hover:not(:disabled) {
             background: #dc2626;
             transform: translateY(-1px);
+        }
+
+        .btn-danger:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn-success {
+            width: 100%;
+            padding: 14px;
+            background: #10b981;
+            color: white;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-success:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #e5e7eb;
         }
 
         .camera-container {
@@ -403,10 +438,34 @@
             <div id="listaNotas" class="lista-notas">
                 <p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>
             </div>
+
+            <!-- Botões de Ação -->
+            <div class="action-buttons" id="actionButtons" style="display: none;">
+                <button id="btnExportar" class="btn-success">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Exportar PDF
+                </button>
+                <button id="btnLimpar" class="btn-danger" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Limpar Todas as NFs
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Biblioteca jsPDF para gerar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
+        const { jsPDF } = window.jspdf;
+
         // Variáveis globais
         let notasFiscais = [];
         let stream = null;
@@ -414,18 +473,22 @@
         let scannerAtivo = false;
         let ultimoCodigoLido = null;
         let timeoutUltimoCodigo = null;
+        let pdfExportado = false;
 
         // Elementos do DOM
         const inputNomeColaborador = document.getElementById('nomeColaborador');
         const inputNomeLoja = document.getElementById('nomeLoja');
         const btnEscanear = document.getElementById('btnEscanear');
         const btnFechar = document.getElementById('btnFechar');
+        const btnExportar = document.getElementById('btnExportar');
+        const btnLimpar = document.getElementById('btnLimpar');
         const cameraContainer = document.getElementById('cameraContainer');
         const video = document.getElementById('video');
         const feedback = document.getElementById('feedback');
         const listaNotas = document.getElementById('listaNotas');
         const contador = document.getElementById('contador');
         const statusText = document.getElementById('statusText');
+        const actionButtons = document.getElementById('actionButtons');
 
         // Event Listeners
         inputNomeColaborador.addEventListener('input', validarCampos);
@@ -433,6 +496,8 @@
 
         btnEscanear.addEventListener('click', iniciarCamera);
         btnFechar.addEventListener('click', pararCamera);
+        btnExportar.addEventListener('click', exportarPDF);
+        btnLimpar.addEventListener('click', limparNotas);
 
         // Função para validar se ambos os campos estão preenchidos
         function validarCampos() {
@@ -479,7 +544,7 @@
                             }, 3000);
                             
                             processarCodigo(codigo);
-                            return; // Para a detecção após encontrar um código válido
+                            return;
                         }
                     }
                 }
@@ -619,6 +684,10 @@
             atualizarLista();
             mostrarFeedback(`✓ NF ${numeroNF} salva com sucesso!`, '#10b981');
             salvarNoLocalStorage();
+            
+            // Desabilitar o botão limpar quando adicionar nova nota
+            pdfExportado = false;
+            btnLimpar.disabled = true;
 
             // Para a câmera após leitura bem-sucedida
             setTimeout(() => {
@@ -626,6 +695,133 @@
             }, 1500);
 
             console.log('Nota fiscal salva:', novaEntrada);
+        }
+
+        // Função para exportar PDF
+        function exportarPDF() {
+            if (notasFiscais.length === 0) {
+                mostrarFeedback('❌ Nenhuma nota para exportar', '#ef4444');
+                return;
+            }
+
+            try {
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                
+                // Agrupar notas por loja
+                const notasPorLoja = {};
+                notasFiscais.forEach(nota => {
+                    if (!notasPorLoja[nota.loja]) {
+                        notasPorLoja[nota.loja] = [];
+                    }
+                    notasPorLoja[nota.loja].push(nota);
+                });
+
+                let primeiraLoja = true;
+
+                // Para cada loja
+                Object.keys(notasPorLoja).sort().forEach(loja => {
+                    if (!primeiraLoja) {
+                        doc.addPage();
+                    }
+                    primeiraLoja = false;
+
+                    const notas = notasPorLoja[loja];
+                    let y = 20;
+
+                    // Título
+                    doc.setFontSize(20);
+                    doc.setTextColor(102, 126, 234);
+                    doc.text('Relatório de Notas Fiscais', pageWidth / 2, y, { align: 'center' });
+                    y += 15;
+
+                    // Nome da Loja
+                    doc.setFontSize(16);
+                    doc.setTextColor(31, 41, 55);
+                    doc.text(`Loja: ${loja}`, 20, y);
+                    y += 10;
+
+                    // Quantidade de NFs
+                    doc.setFontSize(12);
+                    doc.setTextColor(75, 85, 99);
+                    doc.text(`Total de Notas: ${notas.length}`, 20, y);
+                    y += 15;
+
+                    // Linha separadora
+                    doc.setDrawColor(229, 231, 235);
+                    doc.line(20, y, pageWidth - 20, y);
+                    y += 10;
+
+                    // Lista de notas
+                    doc.setFontSize(10);
+                    notas.forEach((nota, index) => {
+                        // Verificar se precisa de nova página
+                        if (y > pageHeight - 30) {
+                            doc.addPage();
+                            y = 20;
+                            
+                            // Repetir cabeçalho da loja
+                            doc.setFontSize(14);
+                            doc.setTextColor(31, 41, 55);
+                            doc.text(`Loja: ${loja} (continuação)`, 20, y);
+                            y += 15;
+                        }
+
+                        // Fundo da nota (alternado)
+                        if (index % 2 === 0) {
+                            doc.setFillColor(249, 250, 251);
+                            doc.rect(15, y - 5, pageWidth - 30, 20, 'F');
+                        }
+
+                        doc.setTextColor(118, 75, 162);
+                        doc.text(`Colaborador: ${nota.colaborador}`, 20, y);
+                        y += 5;
+
+                        doc.setTextColor(75, 85, 99);
+                        doc.text(`NF: ${nota.numeroNF}`, 20, y);
+                        y += 5;
+
+                        doc.setTextColor(107, 114, 128);
+                        doc.setFontSize(9);
+                        doc.text(`Data: ${nota.dataHora}`, 20, y);
+                        doc.setFontSize(10);
+                        y += 10;
+                    });
+                });
+
+                // Salvar PDF
+                const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
+                const nomeArquivo = `relatorio_notas_${dataAtual}.pdf`;
+                doc.save(nomeArquivo);
+
+                mostrarFeedback('✓ PDF exportado com sucesso!', '#10b981');
+                
+                // Habilitar botão de limpar após exportar
+                pdfExportado = true;
+                btnLimpar.disabled = false;
+
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                mostrarFeedback('❌ Erro ao gerar PDF', '#ef4444');
+            }
+        }
+
+        // Função para limpar notas
+        function limparNotas() {
+            if (!pdfExportado) {
+                mostrarFeedback('⚠️ Exporte o PDF antes de limpar!', '#f59e0b');
+                return;
+            }
+
+            if (confirm('⚠️ Tem certeza que deseja limpar todas as notas fiscais?\n\nEsta ação não pode ser desfeita!')) {
+                notasFiscais = [];
+                atualizarLista();
+                salvarNoLocalStorage();
+                pdfExportado = false;
+                btnLimpar.disabled = true;
+                mostrarFeedback('✓ Todas as notas foram removidas!', '#10b981');
+            }
         }
 
         // Função para mostrar feedback visual
@@ -645,8 +841,11 @@
 
             if (notasFiscais.length === 0) {
                 listaNotas.innerHTML = '<p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>';
+                actionButtons.style.display = 'none';
                 return;
             }
+
+            actionButtons.style.display = 'flex';
 
             listaNotas.innerHTML = notasFiscais.map(nota => `
                 <div class="nota-card">
