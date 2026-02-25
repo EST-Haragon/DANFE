@@ -3,572 +3,746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner DANFE</title>
+    <title>QGK – Scanner DANFE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --olive: #4a5c2f;
+            --military: #2e3d1a;
+            --dark: #101508;
+            --neon: #7fff00;
+            --smoke: #8faa72;
+            --card-bg: #161f0c;
+            --border: rgba(74,92,47,0.45);
         }
 
-        html {
-            overflow-y: scroll;
-            overflow-x: hidden;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { overflow-y: scroll; overflow-x: hidden; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cellipse cx='40' cy='28' rx='42' ry='24' fill='%234a5c2f' opacity='0.13'/%3E%3Cellipse cx='140' cy='70' rx='58' ry='28' fill='%232e3d1a' opacity='0.15'/%3E%3Cellipse cx='220' cy='32' rx='44' ry='22' fill='%233d4f1e' opacity='0.1'/%3E%3Cellipse cx='70' cy='150' rx='64' ry='30' fill='%234a5c2f' opacity='0.12'/%3E%3Cellipse cx='195' cy='135' rx='50' ry='28' fill='%232e3d1a' opacity='0.13'/%3E%3Cellipse cx='42' cy='218' rx='55' ry='26' fill='%233d4f1e' opacity='0.11'/%3E%3Cellipse cx='180' cy='225' rx='65' ry='30' fill='%234a5c2f' opacity='0.13'/%3E%3C/svg%3E");
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
         }
 
-        body.modal-open {
-            overflow: hidden;
-            padding-right: 0;
-        }
+        body.modal-open { overflow: hidden; padding-right: 0; }
 
+        /* ── CONTAINER ── */
         .container {
-            max-width: 400px;
+            max-width: 420px;
             margin: 0 auto;
-            background: white;
-            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
             padding: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(127,255,0,0.04);
+            position: relative;
         }
 
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            text-align: center;
-            color: #1f2937;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        /* corner brackets */
+        .container::before, .container::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            border-color: var(--neon);
+            border-style: solid;
+            opacity: 0.35;
+        }
+        .container::before { top: 7px; left: 7px; border-width: 2px 0 0 2px; }
+        .container::after  { bottom: 7px; right: 7px; border-width: 0 2px 2px 0; }
+
+        /* ── LOGO HEADER ── */
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 28px;
         }
 
-        h2 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #374151;
+        .logo-hex {
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
         }
 
-        .form-group {
+        .logo-text-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1;
+        }
+
+        .logo-qgk {
+            font-family: 'Black Ops One', cursive;
+            font-size: 26px;
+            letter-spacing: 5px;
+            color: var(--neon);
+            text-shadow: 0 0 16px rgba(127,255,0,0.35);
+        }
+
+        .logo-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--smoke);
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ── DIVIDER ── */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--olive), transparent);
             margin-bottom: 20px;
         }
 
+        /* ── FORM ── */
+        .form-group { margin-bottom: 14px; }
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #374151;
-            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--smoke);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+            padding: 11px 14px;
+            border: 1px solid var(--border);
+            border-radius: 1px;
+            font-size: 15px;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            background: rgba(0,0,0,0.45);
+            color: #d4e8b0;
+            transition: all 0.25s;
         }
+
+        .form-group input::placeholder { color: rgba(143,170,114,0.3); }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--olive);
+            box-shadow: 0 0 0 2px rgba(74,92,47,0.2), 0 0 10px rgba(127,255,0,0.08);
+            background: rgba(0,0,0,0.6);
         }
 
+        /* ── BUTTONS ── */
         button {
-            font-family: inherit;
+            font-family: 'Black Ops One', cursive;
             cursor: pointer;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            border-radius: 1px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            transition: all 0.22s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-transform: uppercase;
         }
 
         .btn-primary {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 16px;
-            margin-bottom: 20px;
+            padding: 13px;
+            background: var(--olive);
+            color: var(--neon);
+            font-size: 13px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(127,255,0,0.18);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
-
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: #5a7038;
+            box-shadow: 0 0 18px rgba(127,255,0,0.18);
+            transform: translateY(-1px);
         }
-
         .btn-primary:disabled {
-            background: #9ca3af;
+            background: #222;
+            color: #444;
+            border-color: #333;
             cursor: not-allowed;
-            opacity: 0.6;
+            clip-path: none;
         }
 
         .btn-secondary {
             width: 100%;
-            padding: 14px;
-            background: #3b82f6;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 12px;
+            padding: 11px;
+            background: transparent;
+            color: var(--smoke);
+            font-size: 12px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
-
         .btn-secondary:hover:not(:disabled) {
-            background: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+            border-color: var(--olive);
+            color: #d4e8b0;
+            background: rgba(74,92,47,0.15);
         }
-
         .btn-secondary:disabled {
-            background: #9ca3af;
+            opacity: 0.3;
             cursor: not-allowed;
-            opacity: 0.6;
+            clip-path: none;
         }
 
         .btn-danger {
             width: 100%;
-            padding: 12px;
-            background: #ef4444;
-            color: white;
-            font-size: 15px;
+            padding: 11px;
+            background: rgba(192,57,43,0.12);
+            color: #e05a4a;
+            font-size: 12px;
+            border: 1px solid rgba(192,57,43,0.35);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
-
         .btn-danger:hover:not(:disabled) {
-            background: #dc2626;
+            background: rgba(192,57,43,0.25);
             transform: translateY(-1px);
         }
-
         .btn-danger:disabled {
-            background: #9ca3af;
+            opacity: 0.25;
             cursor: not-allowed;
-            opacity: 0.6;
+            clip-path: none;
         }
 
         .btn-success {
             width: 100%;
-            padding: 14px;
-            background: #10b981;
-            color: white;
-            font-size: 15px;
-            margin-bottom: 10px;
+            padding: 11px;
+            background: rgba(74,92,47,0.28);
+            color: var(--neon);
+            font-size: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(127,255,0,0.2);
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
-
         .btn-success:hover:not(:disabled) {
-            background: #059669;
+            background: rgba(74,92,47,0.45);
+            box-shadow: 0 0 14px rgba(127,255,0,0.12);
             transform: translateY(-1px);
         }
-
         .btn-success:disabled {
-            background: #9ca3af;
+            opacity: 0.25;
             cursor: not-allowed;
-            opacity: 0.6;
+            clip-path: none;
+        }
+
+        .btn-close-camera {
+            width: 100%;
+            padding: 9px;
+            margin-top: 8px;
+            background: rgba(0,0,0,0.4);
+            color: var(--smoke);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+            border: 1px solid rgba(143,170,114,0.2);
+            border-radius: 1px;
+        }
+        .btn-close-camera:hover {
+            border-color: rgba(192,57,43,0.5);
+            color: #e05a4a;
+            background: rgba(192,57,43,0.08);
         }
 
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             margin-top: 16px;
             padding-top: 16px;
-            border-top: 2px solid #e5e7eb;
+            border-top: 1px solid var(--border);
         }
 
         .button-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
+        .button-group button { flex: 1; margin: 0; font-size: 11px; }
 
-        .button-group button {
-            flex: 1;
-            margin: 0;
-            font-size: 15px;
-        }
-
+        /* ── CAMERA ── */
         .camera-container {
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             position: relative;
         }
 
         #video {
             width: 100%;
-            border-radius: 10px;
-            border: 3px solid #667eea;
+            border-radius: 1px;
+            border: 2px solid var(--olive);
             display: block;
             background: #000;
         }
 
         .camera-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;
-            height: 40%;
-            border: 3px solid #10b981;
-            border-radius: 10px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            width: 90%; height: 40%;
+            border: 2px solid var(--neon);
+            border-radius: 1px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
             pointer-events: none;
         }
-
         .camera-overlay::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 2px;
-            background: #10b981;
+            background: var(--neon);
             animation: scan 2s linear infinite;
-            box-shadow: 0 0 10px #10b981;
+            box-shadow: 0 0 10px var(--neon);
         }
-
         @keyframes scan {
-            0%, 100% {
-                top: 0;
-            }
-            50% {
-                top: 100%;
-            }
+            0%, 100% { top: 0; }
+            50% { top: 100%; }
         }
 
         .camera-hint {
             position: absolute;
-            bottom: 10px;
-            left: 0;
-            right: 0;
+            bottom: 44px; left: 0; right: 0;
             text-align: center;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
+            color: var(--neon);
+            font-size: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+            padding: 5px;
+            background: rgba(0,0,0,0.55);
         }
 
-        .notas-section {
-            margin-top: 32px;
-        }
+        /* ── NOTAS SECTION ── */
+        .notas-section { margin-top: 24px; }
 
         .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+        }
+
+        .section-header h2 {
+            font-family: 'Black Ops One', cursive;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--smoke);
+            letter-spacing: 3px;
         }
 
         .contador {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
+            background: var(--olive);
+            color: var(--neon);
+            padding: 4px 14px;
+            font-family: 'Black Ops One', cursive;
+            font-size: 13px;
+            letter-spacing: 2px;
+            clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
         }
 
         .lista-notas {
-            max-height: 400px;
+            max-height: 380px;
             overflow-y: auto;
-            padding-right: 8px;
+            padding-right: 4px;
         }
 
-        .lista-notas::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .lista-notas::-webkit-scrollbar-track {
-            background: #f3f4f6;
-            border-radius: 4px;
-        }
-
-        .lista-notas::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 4px;
-        }
-
-        .lista-notas::-webkit-scrollbar-thumb:hover {
-            background: #764ba2;
-        }
+        .lista-notas::-webkit-scrollbar { width: 4px; }
+        .lista-notas::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
+        .lista-notas::-webkit-scrollbar-thumb { background: var(--olive); }
+        .lista-notas::-webkit-scrollbar-thumb:hover { background: var(--neon); }
 
         .nota-card {
-            background: #f9fafb;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--olive);
+            border-radius: 1px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            transition: all 0.25s;
         }
-
         .nota-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
+            border-left-color: var(--neon);
+            background: rgba(74,92,47,0.1);
+            transform: translateX(2px);
         }
 
         .nota-colaborador {
-            font-weight: 700;
-            color: #1f2937;
-            font-size: 16px;
-            margin-bottom: 4px;
+            font-family: 'Black Ops One', cursive;
+            font-weight: 400;
+            color: #d4e8b0;
+            font-size: 15px;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
         }
 
         .nota-loja {
-            color: #667eea;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 6px;
+            color: var(--neon);
+            font-weight: 700;
+            font-size: 12px;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
         }
 
         .nota-numero {
-            color: #4b5563;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 4px;
+            color: var(--smoke);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+            font-family: 'Share Tech Mono', monospace;
         }
 
         .nota-data {
-            color: #9ca3af;
-            font-size: 12px;
+            color: rgba(143,170,114,0.55);
+            font-size: 11px;
+            font-family: 'Share Tech Mono', monospace;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .photo-icon {
-            font-size: 14px;
-        }
+        .photo-icon { font-size: 12px; }
 
         .empty-state {
             text-align: center;
-            color: #9ca3af;
+            color: rgba(143,170,114,0.3);
             padding: 40px 20px;
             font-style: italic;
+            font-size: 14px;
+            letter-spacing: 1px;
+            font-family: 'Share Tech Mono', monospace;
         }
 
+        /* ── FEEDBACK ── */
         .feedback {
             display: none;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            color: white;
-            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 1px;
+            margin-bottom: 14px;
+            color: #000;
+            font-weight: 700;
             text-align: center;
+            font-size: 14px;
+            letter-spacing: 1px;
+            font-family: 'Share Tech Mono', monospace;
             animation: slideDown 0.3s ease;
+            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
-
         @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* ── MODAL ── */
         .modal-confirmacao {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
+            inset: 0;
+            background: rgba(0,0,0,0.82);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
         }
-
-        .modal-confirmacao.show {
-            display: flex;
-        }
+        .modal-confirmacao.show { display: flex; }
 
         .modal-content {
-            background: white;
-            border-radius: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
             padding: 28px;
             max-width: 400px;
             width: 100%;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            animation: modalSlideUp 0.3s ease;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(127,255,0,0.06);
+            animation: modalUp 0.28s ease;
+            position: relative;
         }
+        .modal-content::before, .modal-content::after {
+            content: '';
+            position: absolute;
+            width: 14px; height: 14px;
+            border-color: var(--neon);
+            border-style: solid;
+            opacity: 0.4;
+        }
+        .modal-content::before { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
+        .modal-content::after  { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
-        @keyframes modalSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes modalUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .modal-header {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1f2937;
+            font-family: 'Black Ops One', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--neon);
+            letter-spacing: 3px;
             margin-bottom: 20px;
             text-align: center;
+            text-shadow: 0 0 12px rgba(127,255,0,0.3);
         }
 
         .modal-info {
-            background: #f3f4f6;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 1px;
+            margin-bottom: 16px;
         }
 
         .modal-info-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 14px;
         }
-
-        .modal-info-item:last-child {
-            margin-bottom: 0;
-        }
+        .modal-info-item:last-child { margin-bottom: 0; }
 
         .modal-info-label {
-            color: #6b7280;
-            font-weight: 500;
+            color: var(--smoke);
+            font-weight: 600;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
         }
 
         .modal-info-value {
-            color: #1f2937;
+            color: #d4e8b0;
             font-weight: 700;
+            font-size: 14px;
         }
 
         .modal-barcode {
-            background: #fef3c7;
-            border: 2px dashed #f59e0b;
-            padding: 12px;
-            border-radius: 8px;
+            background: rgba(0,0,0,0.5);
+            border: 1px dashed rgba(74,92,47,0.5);
+            padding: 10px;
+            border-radius: 1px;
             text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #92400e;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--smoke);
             word-break: break-all;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
         }
 
         .modal-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
         }
+        .modal-actions button { flex: 1; padding: 13px; font-size: 13px; }
 
-        .modal-actions button {
-            flex: 1;
-            padding: 14px;
-            font-size: 16px;
-        }
-
+        /* ── BARCODE READER ── */
         .barcode-input-container {
             display: none;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
         }
-
-        .barcode-input-container.show {
-            display: block;
-        }
+        .barcode-input-container.show { display: block; }
 
         .barcode-display {
             width: 100%;
-            padding: 14px;
-            border: 3px solid #10b981;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 12px 14px;
+            border: 2px solid var(--olive);
+            border-radius: 1px;
+            font-size: 15px;
+            font-weight: 700;
             text-align: center;
-            background: #f0fdf4;
-            color: #065f46;
-            font-family: 'Courier New', monospace;
-            margin-bottom: 12px;
+            background: rgba(0,0,0,0.5);
+            color: var(--neon);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
         }
 
         .barcode-hint {
             text-align: center;
-            color: #059669;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 12px;
-            background: #d1fae5;
-            border-radius: 8px;
+            color: var(--smoke);
+            font-size: 11px;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 2px;
+            padding: 10px;
+            background: rgba(74,92,47,0.12);
+            border: 1px solid var(--border);
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .hidden-barcode-input {
             position: absolute;
             left: -9999px;
-            width: 1px;
-            height: 1px;
+            width: 1px; height: 1px;
         }
+
+
+        /* Destaque dos dígitos no modal */
+        .modal-barcode .digitos-ok    { color: var(--neon); font-size: 12px; }
+        .modal-barcode .digitos-alerta{ color: #f0c040; font-size: 12px; }
+        .modal-barcode .len-badge {
+            display: inline-block; margin-top: 6px; font-size: 10px;
+            letter-spacing: 1px; padding: 2px 8px;
+            background: rgba(74,92,47,0.3); border-radius: 2px; color: var(--smoke);
+        }
+
+        /* Engine badge */
+        .engine-badge {
+            display: inline-block;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            letter-spacing: 2px;
+            padding: 4px 12px;
+            border-radius: 1px;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+        }
+        .engine-badge.native   { background: rgba(127,255,0,0.1); color: var(--neon); border: 1px solid rgba(127,255,0,0.3); }
+        .engine-badge.fallback { background: rgba(240,192,64,0.1); color: #f0c040; border: 1px solid rgba(240,192,64,0.3); }
+
+        /* Destaque dos dígitos no modal */
+        .modal-barcode .digitos-ok    { color: var(--neon); font-size: 12px; }
+        .modal-barcode .digitos-alerta{ color: #f0c040; font-size: 12px; }
+        .modal-barcode .len-badge {
+            display: inline-block; margin-top: 6px; font-size: 10px;
+            letter-spacing: 1px; padding: 2px 8px;
+            background: rgba(74,92,47,0.3); border-radius: 2px; color: var(--smoke);
+        }
+        /* Checkbox foto no modal */
+        .foto-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 1px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+        .foto-checkbox-label:hover { background: rgba(74,92,47,0.15); }
+        .foto-checkbox-label input[type="checkbox"] { display: none; }
+        .foto-checkbox-box {
+            width: 20px; height: 20px;
+            border: 2px solid var(--olive);
+            border-radius: 1px;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            background: transparent;
+        }
+        .foto-checkbox-label input:checked + .foto-checkbox-box {
+            background: var(--olive);
+            border-color: var(--neon);
+        }
+        .foto-checkbox-label input:checked + .foto-checkbox-box::after {
+            content: '✓';
+            color: var(--neon);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .foto-checkbox-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: var(--smoke);
+            letter-spacing: 1px;
+        }
+        .foto-checkbox-label:has(input:checked) .foto-checkbox-text { color: var(--neon); }
+
+        /* Camera badge na lista */
+        .nota-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        .camera-badge {
+            font-size: 18px;
+            line-height: 1;
+            filter: drop-shadow(0 0 4px rgba(127,255,0,0.4));
+        }
+
+        /* Linha loja + botão editar */
+        .nota-loja-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .btn-edit-loja {
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 1px;
+            opacity: 0.45;
+            transition: opacity 0.2s, background 0.2s;
+            letter-spacing: 0;
+            font-family: inherit;
+        }
+        .nota-card:hover .btn-edit-loja { opacity: 1; }
+        .btn-edit-loja:hover { background: rgba(74,92,47,0.3); opacity: 1; }
 
         .enter-hint {
             text-align: center;
-            color: #6b7280;
-            font-size: 13px;
+            color: rgba(143,170,114,0.45);
+            font-size: 11px;
             margin-top: 12px;
-            font-style: italic;
-        }
-
-        .btn-close-camera {
-            width: 100%;
-            padding: 12px;
-            background: #6b7280;
-            color: white;
-            font-size: 15px;
-            margin-top: 10px;
-        }
-
-        .btn-close-camera:hover {
-            background: #4b5563;
-            transform: translateY(-1px);
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📦 Scanner DANFE</h1>
+
+        <!-- Logo QGK -->
+        <div class="logo-header">
+            <svg class="logo-hex" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="50,4 92,27 92,73 50,96 8,73 8,27"
+                         fill="#2e3d1a" stroke="#4a5c2f" stroke-width="2"/>
+                <polygon points="50,16 80,33 80,67 50,84 20,67 20,33"
+                         fill="none" stroke="#4a5c2f" stroke-width="1" opacity="0.5"/>
+                <text x="50" y="62" text-anchor="middle"
+                      font-family="Black Ops One, cursive" font-size="28"
+                      fill="#7fff00" letter-spacing="1">QGK</text>
+            </svg>
+            <div class="logo-text-block">
+                <span class="logo-qgk">QGK</span>
+                <span class="logo-sub">Scanner DANFE</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
 
         <div id="feedback" class="feedback"></div>
 
         <div class="form-group">
-            <label for="inputNomeColaborador">👤 Nome do Colaborador</label>
-            <input type="text" id="inputNomeColaborador" placeholder="Digite o nome do colaborador" autocomplete="off">
+            <label for="inputNomeColaborador">👤 Colaborador</label>
+            <input type="text" id="inputNomeColaborador" placeholder="Nome do colaborador" autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label for="inputNomeLoja">🏪 Nome da Loja</label>
-            <input type="text" id="inputNomeLoja" placeholder="Digite o nome da loja" autocomplete="off">
+            <label for="inputNomeLoja">🏪 Loja</label>
+            <input type="text" id="inputNomeLoja" placeholder="Nome da loja" autocomplete="off">
         </div>
 
         <button id="btnEscanear" class="btn-primary">
@@ -579,22 +753,24 @@
             🔍 Usar Leitor de Código de Barras
         </button>
 
-        <!-- Container do leitor de código invisível -->
+        <!-- Leitor de código invisível -->
         <div id="barcodeInputContainer" class="barcode-input-container">
-            <input type="text" id="barcodeDisplay" class="barcode-display" placeholder="Aguardando código..." readonly>
-            <div class="barcode-hint">✨ Aponte o leitor para o código de barras</div>
+            <input type="text" id="barcodeDisplay" class="barcode-display" placeholder="// AGUARDANDO CÓDIGO //" readonly>
+            <div class="barcode-hint">⬡ APONTE O LEITOR PARA O CÓDIGO DE BARRAS</div>
             <input type="text" id="barcodeInput" class="hidden-barcode-input" autocomplete="off">
-            <button id="btnFecharLeitor" class="btn-close-camera" style="margin-top: 12px;">
-                ❌ Fechar Leitor
+            <button id="btnFecharLeitor" class="btn-close-camera" style="margin-top: 10px;">
+                ✕ FECHAR LEITOR
             </button>
         </div>
+
+        <div id="engineBadge" class="engine-badge">⬡ VERIFICANDO SUPORTE...</div>
 
         <div id="cameraContainer" class="camera-container" style="display: none;">
             <video id="video" playsinline></video>
             <div class="camera-overlay"></div>
-            <div class="camera-hint">Posicione o código de barras dentro da área</div>
+            <div class="camera-hint" id="cameraHint">⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA</div>
             <button id="btnFecharCamera" class="btn-close-camera">
-                ❌ Fechar Câmera
+                ✕ FECHAR CÂMERA
             </button>
         </div>
 
@@ -604,7 +780,7 @@
                 <span id="contador" class="contador">0</span>
             </div>
             <div id="listaNotas" class="lista-notas">
-                <p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>
+                <p class="empty-state">// nenhuma nota escaneada ainda</p>
             </div>
             <div id="actionButtons" class="action-buttons" style="display: none;">
                 <button id="btnExportarJSON" class="btn-success">
@@ -625,517 +801,740 @@
     <!-- Modal de Confirmação -->
     <div id="modalConfirmacao" class="modal-confirmacao">
         <div class="modal-content">
-            <div class="modal-header">✅ Confirmar Leitura</div>
+            <div class="modal-header">⬡ CONFIRMAR LEITURA</div>
             <div class="modal-info">
                 <div class="modal-info-item">
-                    <span class="modal-info-label">Colaborador:</span>
+                    <span class="modal-info-label">Colaborador</span>
                     <span id="modalColaborador" class="modal-info-value">-</span>
                 </div>
                 <div class="modal-info-item">
-                    <span class="modal-info-label">Loja:</span>
+                    <span class="modal-info-label">Loja</span>
                     <span id="modalLoja" class="modal-info-value">-</span>
                 </div>
                 <div class="modal-info-item">
-                    <span class="modal-info-label">NF:</span>
+                    <span class="modal-info-label">NF</span>
                     <span id="modalNumeroNF" class="modal-info-value">-</span>
                 </div>
             </div>
             <div id="modalBarcode" class="modal-barcode"></div>
+
+            <!-- Checkbox foto -->
+            <label class="foto-checkbox-label">
+                <input type="checkbox" id="checkFoto">
+                <span class="foto-checkbox-box"></span>
+                <span class="foto-checkbox-text">📷 Nota acompanha foto</span>
+            </label>
+
             <div class="modal-actions">
-                <button id="btnCancelar" class="btn-danger">❌ Cancelar</button>
-                <button id="btnConfirmar" class="btn-success">✅ Confirmar</button>
+                <button id="btnCancelar" class="btn-danger">✕ Cancelar</button>
+                <button id="btnConfirmar" class="btn-success">✓ Confirmar</button>
             </div>
-            <div class="enter-hint">Pressione ENTER para confirmar</div>
+            <div class="enter-hint">// pressione ENTER para confirmar</div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+    <!-- Modal editar loja -->
+    <div id="modalEditarLoja" class="modal-confirmacao">
+        <div class="modal-content">
+            <div class="modal-header">✏️ EDITAR LOJA</div>
+            <div class="modal-info" style="margin-bottom:16px;">
+                <div class="modal-info-item">
+                    <span class="modal-info-label">NF</span>
+                    <span id="editModalNF" class="modal-info-value">-</span>
+                </div>
+                <div class="modal-info-item">
+                    <span class="modal-info-label">Colaborador</span>
+                    <span id="editModalColaborador" class="modal-info-value">-</span>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom:18px;">
+                <label for="editInputLoja">🏪 Nova Loja</label>
+                <input type="text" id="editInputLoja" placeholder="Nome da loja" autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button id="btnEditCancelar" class="btn-danger">✕ Cancelar</button>
+                <button id="btnEditSalvar" class="btn-success">✓ Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- ZXing fallback para browsers sem BarcodeDetector nativo -->
+    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 
     <script>
-        const { jsPDF } = window.jspdf;
+    const { jsPDF } = window.jspdf;
 
-        // Elementos DOM
-        const inputNomeColaborador = document.getElementById('inputNomeColaborador');
-        const inputNomeLoja = document.getElementById('inputNomeLoja');
-        const btnEscanear = document.getElementById('btnEscanear');
-        const btnLeitorCodigo = document.getElementById('btnLeitorCodigo');
-        const cameraContainer = document.getElementById('cameraContainer');
-        const video = document.getElementById('video');
-        const listaNotas = document.getElementById('listaNotas');
-        const contador = document.getElementById('contador');
-        const feedback = document.getElementById('feedback');
-        const btnExportarJSON = document.getElementById('btnExportarJSON');
-        const btnExportarPDF = document.getElementById('btnExportarPDF');
-        const btnLimpar = document.getElementById('btnLimpar');
-        const actionButtons = document.getElementById('actionButtons');
+    // ─── DOM ───────────────────────────────────────────────
+    const inputNomeColaborador  = document.getElementById('inputNomeColaborador');
+    const inputNomeLoja         = document.getElementById('inputNomeLoja');
+    const btnEscanear           = document.getElementById('btnEscanear');
+    const btnLeitorCodigo       = document.getElementById('btnLeitorCodigo');
+    const cameraContainer       = document.getElementById('cameraContainer');
+    const video                 = document.getElementById('video');
+    const listaNotas            = document.getElementById('listaNotas');
+    const contador              = document.getElementById('contador');
+    const feedback              = document.getElementById('feedback');
+    const btnExportarJSON       = document.getElementById('btnExportarJSON');
+    const btnExportarPDF        = document.getElementById('btnExportarPDF');
+    const btnLimpar             = document.getElementById('btnLimpar');
+    const actionButtons         = document.getElementById('actionButtons');
+    const modalConfirmacao      = document.getElementById('modalConfirmacao');
+    const modalColaborador      = document.getElementById('modalColaborador');
+    const modalLoja             = document.getElementById('modalLoja');
+    const modalNumeroNF         = document.getElementById('modalNumeroNF');
+    const modalBarcode          = document.getElementById('modalBarcode');
+    const btnCancelar           = document.getElementById('btnCancelar');
+    const btnConfirmar          = document.getElementById('btnConfirmar');
+    const barcodeInputContainer = document.getElementById('barcodeInputContainer');
+    const barcodeInput          = document.getElementById('barcodeInput');
+    const barcodeDisplay        = document.getElementById('barcodeDisplay');
+    const cameraHint            = document.getElementById('cameraHint');
+    const engineBadge           = document.getElementById('engineBadge');
 
-        // Elementos do modal
-        const modalConfirmacao = document.getElementById('modalConfirmacao');
-        const modalColaborador = document.getElementById('modalColaborador');
-        const modalLoja = document.getElementById('modalLoja');
-        const modalNumeroNF = document.getElementById('modalNumeroNF');
-        const modalBarcode = document.getElementById('modalBarcode');
-        const btnCancelar = document.getElementById('btnCancelar');
-        const btnConfirmar = document.getElementById('btnConfirmar');
+    // ─── ESTADO ────────────────────────────────────────────
+    let notasFiscais            = [];
+    let scannerAtivo            = false;
+    let stream                  = null;
+    let pdfExportado            = false;
+    let modoLeitor              = false;
+    let codigoAtualConfirmacao  = null;
+    let temFotoAtual            = false;
+    let rafId                   = null;   // requestAnimationFrame do BarcodeDetector
+    let zxingReader             = null;   // instância ZXing
+    let loopPausado             = false;  // true enquanto modal está aberto
+    let cooldownCodigo          = '';     // último código aceito (evita reler imediatamente)
+    let cooldownTimer           = null;   // timer que limpa o cooldown
 
-        // Elementos do leitor de código
-        const barcodeInputContainer = document.getElementById('barcodeInputContainer');
-        const barcodeInput = document.getElementById('barcodeInput');
-        const barcodeDisplay = document.getElementById('barcodeDisplay');
+    // ─── LEITOR FÍSICO ─────────────────────────────────────
+    const MIN_LEN      = 20;
+    const PAUSA_LEITOR = 200;
+    let bufferLeitor   = '';
+    let timerLeitor    = null;
+    let ultimoKeyTime  = 0;
 
-        // Variáveis de controle
-        let notasFiscais = [];
-        let scannerAtivo = false;
-        let stream = null;
-        let pdfExportado = false;
-        let modoLeitor = false;
-        let timeoutBarcodeInput = null;
-        let codigoAtualConfirmacao = null;
-        let temFotoAtual = false;
+    // ─── EVENTOS BASE ──────────────────────────────────────
+    btnEscanear.addEventListener('click', iniciarScanner);
+    btnLeitorCodigo.addEventListener('click', iniciarLeitorCodigo);
+    document.getElementById('btnFecharCamera').addEventListener('click', pararScanner);
+    document.getElementById('btnFecharLeitor').addEventListener('click', pararLeitorCodigo);
+    btnExportarJSON.addEventListener('click', exportarJSON);
+    btnExportarPDF.addEventListener('click', exportarPDF);
+    btnLimpar.addEventListener('click', limparNotas);
+    btnCancelar.addEventListener('click', fecharModal);
+    btnConfirmar.addEventListener('click', confirmarLeitura);
 
-        // Event Listeners
-        btnEscanear.addEventListener('click', iniciarScanner);
-        btnLeitorCodigo.addEventListener('click', iniciarLeitorCodigo);
-        document.getElementById('btnFecharCamera').addEventListener('click', pararScanner);
-        document.getElementById('btnFecharLeitor').addEventListener('click', pararLeitorCodigo);
-        btnExportarJSON.addEventListener('click', exportarJSON);
-        btnExportarPDF.addEventListener('click', exportarPDF);
-        btnLimpar.addEventListener('click', limparNotas);
-        btnCancelar.addEventListener('click', fecharModal);
-        btnConfirmar.addEventListener('click', confirmarLeitura);
-
-        // Event listener para o leitor de código de barras
-        barcodeInput.addEventListener('input', function(e) {
-            const valor = e.target.value;
-            barcodeDisplay.value = valor;
-
-            clearTimeout(timeoutBarcodeInput);
-            timeoutBarcodeInput = setTimeout(() => {
-                if (valor && valor.length > 10) {
-                    processarCodigoLeitor(valor);
-                }
-            }, 100);
-        });
-
-        // Event listener para Enter no modal
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && modalConfirmacao.classList.contains('show')) {
-                e.preventDefault();
-                confirmarLeitura();
-            }
-        });
-
-        // Carregar dados ao iniciar
-        carregarDoLocalStorage();
-
-        function extrairNumeroNF(codigoBarras) {
-            if (!codigoBarras || typeof codigoBarras !== 'string') return null;
-            const codigo = codigoBarras.trim();
-            if (codigo.length >= 44) {
-                return codigo.substring(25, 34);
-            }
-            return codigo;
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && modalConfirmacao.classList.contains('show')) {
+            e.preventDefault(); confirmarLeitura(); return;
         }
+        if (modoLeitor && !modalConfirmacao.classList.contains('show')) capturarTeclaLeitor(e);
+    });
 
-        async function iniciarScanner() {
-            const nomeColaborador = inputNomeColaborador.value.trim();
-            const nomeLoja = inputNomeLoja.value.trim();
+    carregarDoLocalStorage();
 
-            if (!nomeColaborador || !nomeLoja) {
-                mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#ef4444');
-                return;
-            }
+    // ═══════════════════════════════════════════════════════
+    //  DETECÇÃO DE ENGINE
+    //  Prioridade: BarcodeDetector (nativo) → ZXing (JS)
+    // ═══════════════════════════════════════════════════════
+    const NATIVE_SUPPORTED = ('BarcodeDetector' in window);
 
-            scannerAtivo = true;
-            cameraContainer.style.display = 'block';
-            btnEscanear.style.display = 'none';
-            btnLeitorCodigo.style.display = 'none';
+    function setEngineBadge(txt, ok) {
+        engineBadge.textContent = txt;
+        engineBadge.className   = 'engine-badge ' + (ok ? 'native' : 'fallback');
+    }
 
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' }
-                });
-                video.srcObject = stream;
-                video.play();
-
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: video,
-                        constraints: {
-                            facingMode: "environment"
-                        },
-                    },
-                    decoder: {
-                        readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "i2of5_reader"]
-                    },
-                    locate: true
-                }, function (err) {
-                    if (err) {
-                        console.error(err);
-                        mostrarFeedback('❌ Erro ao iniciar câmera', '#ef4444');
-                        pararScanner();
-                        return;
-                    }
-                    Quagga.start();
-                });
-
-                Quagga.onDetected(function (result) {
-                    if (result && result.codeResult && result.codeResult.code) {
-                        const codigo = result.codeResult.code;
-                        pararScanner();
-                        mostrarModalConfirmacao(codigo, true);
-                    }
-                });
-
-            } catch (error) {
-                console.error('Erro ao acessar câmera:', error);
-                mostrarFeedback('❌ Erro ao acessar câmera', '#ef4444');
-                pararScanner();
-            }
-        }
-
-        function pararScanner() {
-            scannerAtivo = false;
-
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-
-            if (typeof Quagga !== 'undefined') {
-                Quagga.stop();
-            }
-
-            cameraContainer.style.display = 'none';
-            btnEscanear.style.display = 'flex';
-            btnLeitorCodigo.style.display = 'flex';
-        }
-
-        function iniciarLeitorCodigo() {
-            const nomeColaborador = inputNomeColaborador.value.trim();
-            const nomeLoja = inputNomeLoja.value.trim();
-
-            if (!nomeColaborador || !nomeLoja) {
-                mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#ef4444');
-                return;
-            }
-
-            modoLeitor = true;
-            barcodeInputContainer.classList.add('show');
-            cameraContainer.style.display = 'none';
-            btnEscanear.style.display = 'none';
-            btnLeitorCodigo.style.display = 'none';
-
-            barcodeInput.value = '';
-            barcodeDisplay.value = '';
-            barcodeInput.focus();
-        }
-
-        function pararLeitorCodigo() {
-            modoLeitor = false;
-            barcodeInputContainer.classList.remove('show');
-            barcodeInput.value = '';
-            barcodeDisplay.value = '';
-            btnEscanear.style.display = 'flex';
-            btnLeitorCodigo.style.display = 'flex';
-            clearTimeout(timeoutBarcodeInput);
-        }
-
-        function processarCodigoLeitor(codigo) {
-            if (!codigo || codigo.trim() === '') return;
-
-            barcodeInput.value = '';
-            barcodeDisplay.value = '';
-            barcodeInput.focus();
-
-            mostrarModalConfirmacao(codigo.trim(), false);
-        }
-
-        function mostrarModalConfirmacao(codigo, temFoto = false) {
-            const numeroNF = extrairNumeroNF(codigo);
-            const nomeColaborador = inputNomeColaborador.value.trim();
-            const nomeLoja = inputNomeLoja.value.trim();
-
-            codigoAtualConfirmacao = codigo;
-            temFotoAtual = temFoto;
-
-            modalColaborador.textContent = nomeColaborador;
-            modalLoja.textContent = nomeLoja;
-            modalNumeroNF.textContent = numeroNF || 'Não identificado';
-            modalBarcode.textContent = codigo;
-
-            modalConfirmacao.classList.add('show');
-            document.body.classList.add('modal-open');
-
-            // Focar no botão confirmar para permitir Enter
-            btnConfirmar.focus();
-        }
-
-        function fecharModal() {
-            modalConfirmacao.classList.remove('show');
-            document.body.classList.remove('modal-open');
-            codigoAtualConfirmacao = null;
-            temFotoAtual = false;
-
-            // Retornar ao modo leitor se estava ativo
-            if (modoLeitor) {
-                barcodeInput.focus();
-            }
-        }
-
-        function confirmarLeitura() {
-            if (!codigoAtualConfirmacao) return;
-
-            processarCodigo(codigoAtualConfirmacao, temFotoAtual);
-            fecharModal();
-        }
-
-        function processarCodigo(codigoBarras, temFoto = false) {
-            const numeroNF = extrairNumeroNF(codigoBarras);
-            const nomeColaborador = inputNomeColaborador.value.trim();
-            const nomeLoja = inputNomeLoja.value.trim();
-
-            if (!numeroNF || !nomeColaborador || !nomeLoja) {
-                mostrarFeedback('❌ Dados inválidos', '#ef4444');
-                return;
-            }
-
-            const jaExiste = notasFiscais.some(
-                nota => nota.numeroNF === numeroNF && nota.loja === nomeLoja && nota.colaborador === nomeColaborador
+    // Mostra a engine disponível ao carregar
+    if (NATIVE_SUPPORTED) {
+        BarcodeDetector.getSupportedFormats().then(fmts => {
+            const temCode128 = fmts.includes('code_128');
+            setEngineBadge(
+                '⬡ NATIVE BARCODE API' + (temCode128 ? ' · CODE128 ✓' : ''),
+                true
             );
+        }).catch(() => setEngineBadge('⬡ NATIVE BARCODE API', true));
+    } else {
+        setEngineBadge('⬡ ZXING JS (FALLBACK)', false);
+    }
 
-            if (jaExiste) {
-                mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#f59e0b');
-                return;
-            }
-
-            const novaEntrada = {
-                id: Date.now(),
-                colaborador: nomeColaborador,
-                loja: nomeLoja,
-                numeroNF: numeroNF,
-                codigoCompleto: codigoBarras,
-                temFoto: temFoto,
-                dataHora: new Date().toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                })
-            };
-
-            notasFiscais.unshift(novaEntrada);
-            atualizarLista();
-            mostrarFeedback(`✓ NF ${numeroNF} salva${temFoto ? ' com foto' : ''}!`, '#10b981');
-            salvarNoLocalStorage();
-            salvarNoBackend(novaEntrada);
-
-            pdfExportado = false;
-            btnLimpar.disabled = true;
+    // ═══════════════════════════════════════════════════════
+    //  CÂMERA – iniciar / parar
+    // ═══════════════════════════════════════════════════════
+    async function iniciarScanner() {
+        const nomeColaborador = inputNomeColaborador.value.trim();
+        const nomeLoja        = inputNomeLoja.value.trim();
+        if (!nomeColaborador || !nomeLoja) {
+            mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#c0392b');
+            return;
         }
 
-        async function salvarNoBackend(nota) {
-            try {
-                const response = await fetch('http://localhost:3000/api/salvar-nota', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(nota)
-                });
+        scannerAtivo = true;
+        cameraContainer.style.display = 'block';
+        btnEscanear.style.display     = 'none';
+        btnLeitorCodigo.style.display = 'none';
+        cameraHint.textContent        = '⬡ INICIANDO...';
 
-                if (!response.ok) {
-                    console.error('Erro ao salvar no backend');
+        try {
+            // Solicita câmera traseira em alta resolução
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: 'environment' },
+                    width:  { ideal: 1920 },
+                    height: { ideal: 1080 }
                 }
-            } catch (error) {
-                console.error('Erro de conexão com backend:', error);
+            });
+            video.srcObject = stream;
+            await video.play();
+            cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
+
+            if (NATIVE_SUPPORTED) {
+                iniciarBarcodeDetectorNativo();
+            } else {
+                await iniciarZXing();
             }
+        } catch(err) {
+            console.error('[CAMERA]', err);
+            mostrarFeedback('❌ Erro ao acessar câmera', '#c0392b');
+            pararScanner();
         }
+    }
 
-        function atualizarLista() {
-            if (notasFiscais.length === 0) {
-                listaNotas.innerHTML = '<p class="empty-state">Nenhuma nota fiscal escaneada ainda</p>';
-                actionButtons.style.display = 'none';
-                contador.textContent = '0';
-                return;
+    // Para TUDO e fecha a câmera (botão Fechar)
+    function pararScanner() {
+        scannerAtivo = false;
+        loopPausado  = false;
+        clearTimeout(cooldownTimer);
+        cooldownCodigo = '';
+
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        if (zxingReader) { try { zxingReader.reset(); } catch(e) {} zxingReader = null; }
+        if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+
+        cameraContainer.style.display = 'none';
+        btnEscanear.style.display     = 'flex';
+        btnLeitorCodigo.style.display = 'flex';
+    }
+
+    // Pausa o loop (modal aberto) sem fechar câmera
+    function pausarLoop() {
+        loopPausado = true;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        cameraHint.textContent = '⬡ AGUARDANDO CONFIRMAÇÃO...';
+    }
+
+    // Retoma o loop após fechar o modal, com cooldown para não reler o mesmo código
+    function retomarLoop(codigoLido) {
+        loopPausado    = true; // mantém pausado durante cooldown
+        cooldownCodigo = codigoLido;
+        cameraHint.textContent = '⬡ RECARREGANDO...';
+
+        clearTimeout(cooldownTimer);
+        cooldownTimer = setTimeout(() => {
+            if (!scannerAtivo) return;
+            cooldownCodigo = '';
+            loopPausado    = false;
+            cameraHint.textContent = '⬡ POSICIONE O PRÓXIMO CÓDIGO';
+            if (NATIVE_SUPPORTED) {
+                iniciarBarcodeDetectorNativo();
+            } else {
+                iniciarZXing();
             }
+        }, 1500); // 1.5s de cooldown antes de aceitar novo código
+    }
 
-            actionButtons.style.display = 'flex';
-            contador.textContent = notasFiscais.length;
+    // ═══════════════════════════════════════════════════════
+    //  ENGINE 1 – BarcodeDetector (nativo do hardware)
+    //  Disponível: Android Chrome 83+, Samsung Internet,
+    //              macOS Ventura Safari 17+
+    // ═══════════════════════════════════════════════════════
+    function iniciarBarcodeDetectorNativo() {
+        // Formatos que o DANFE usa (Code128 é o principal)
+        const detector = new BarcodeDetector({
+            formats: ['code_128', 'itf', 'ean_13', 'ean_8', 'code_39', 'qr_code']
+        });
 
-            listaNotas.innerHTML = notasFiscais.map(nota => `
-                <div class="nota-card">
-                    <div class="nota-colaborador">${nota.colaborador}</div>
-                    <div class="nota-loja">${nota.loja}</div>
-                    <div class="nota-numero">${nota.numeroNF}</div>
-                    <div class="nota-data">${nota.dataHora}${nota.temFoto ? ' <span class="photo-icon">📸</span>' : ''}</div>
-                </div>
-            `).join('');
-        }
+        let ultimoCodigo = '';
+        let contagemVotos = 0;
+        const MIN_VOTOS = 2; // BarcodeDetector é muito mais preciso; 2 já basta
 
-        function mostrarFeedback(mensagem, cor) {
-            feedback.textContent = mensagem;
-            feedback.style.background = cor;
-            feedback.style.display = 'block';
+        async function loop() {
+            if (!scannerAtivo || loopPausado) return;
 
-            setTimeout(() => {
-                feedback.style.display = 'none';
-            }, 3000);
-        }
-
-        function salvarNoLocalStorage() {
-            localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
-        }
-
-        function carregarDoLocalStorage() {
-            const dados = localStorage.getItem('notasFiscais');
-            if (dados) {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 try {
-                    notasFiscais = JSON.parse(dados);
-                    atualizarLista();
-                } catch (error) {
-                    console.error('Erro ao carregar dados:', error);
-                }
-            }
-        }
+                    const barcodes = await detector.detect(video);
+                    if (barcodes.length > 0) {
+                        // Pega o código mais longo (mais provável de ser o DANFE de 44 dig.)
+                        const melhor = barcodes.reduce((a, b) =>
+                            a.rawValue.length >= b.rawValue.length ? a : b
+                        );
+                        const raw   = melhor.rawValue;
+                        const limpo = raw.replace(/\D/g, '');
 
-        async function exportarJSON() {
-            if (notasFiscais.length === 0) {
-                mostrarFeedback('❌ Nenhuma nota para exportar', '#ef4444');
-                return;
-            }
-
-            try {
-                // Salvar localmente
-                const dataStr = JSON.stringify(notasFiscais, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-                link.download = `dados_dashboard_${dataAtual}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-
-                // Enviar para backend
-                await fetch('http://localhost:3000/api/exportar-json', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ notas: notasFiscais })
-                });
-
-                mostrarFeedback('✓ Dados exportados para Dashboard!', '#10b981');
-            } catch (error) {
-                mostrarFeedback('❌ Erro ao exportar', '#ef4444');
-            }
-        }
-
-        function exportarPDF() {
-            if (notasFiscais.length === 0) {
-                mostrarFeedback('❌ Nenhuma nota para exportar', '#ef4444');
-                return;
-            }
-
-            try {
-                const doc = new jsPDF();
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-
-                const notasPorLoja = {};
-                notasFiscais.forEach(nota => {
-                    if (!notasPorLoja[nota.loja]) {
-                        notasPorLoja[nota.loja] = [];
-                    }
-                    notasPorLoja[nota.loja].push(nota);
-                });
-
-                let primeiraLoja = true;
-
-                Object.keys(notasPorLoja).sort().forEach(loja => {
-                    if (!primeiraLoja) {
-                        doc.addPage();
-                    }
-                    primeiraLoja = false;
-
-                    const notas = notasPorLoja[loja];
-                    let y = 20;
-
-                    doc.setFontSize(20);
-                    doc.setTextColor(102, 126, 234);
-                    doc.text('Relatório de Notas Fiscais', pageWidth / 2, y, { align: 'center' });
-                    y += 15;
-
-                    doc.setFontSize(16);
-                    doc.setTextColor(31, 41, 55);
-                    doc.text(`Loja: ${loja}`, 20, y);
-                    y += 10;
-
-                    doc.setFontSize(12);
-                    doc.setTextColor(75, 85, 99);
-                    doc.text(`Total de Notas: ${notas.length}`, 20, y);
-                    y += 15;
-
-                    doc.setDrawColor(229, 231, 235);
-                    doc.line(20, y, pageWidth - 20, y);
-                    y += 10;
-
-                    doc.setFontSize(10);
-                    doc.setTextColor(107, 114, 128);
-
-                    notas.forEach((nota, index) => {
-                        if (y > pageHeight - 40) {
-                            doc.addPage();
-                            y = 20;
+                        // Ignora se ainda está no cooldown do código anterior
+                        if (limpo === cooldownCodigo) {
+                            rafId = requestAnimationFrame(loop); return;
                         }
 
-                        const fotoIcon = nota.temFoto ? ' 📸' : '';
-                        doc.text(`${index + 1}. NF: ${nota.numeroNF}${fotoIcon}`, 20, y);
-                        y += 5;
-                        doc.setFontSize(9);
-                        doc.setTextColor(155, 160, 168);
-                        doc.text(`Colaborador: ${nota.colaborador}`, 25, y);
-                        y += 4;
-                        doc.text(`Data: ${nota.dataHora}`, 25, y);
-                        y += 8;
-                        doc.setFontSize(10);
-                        doc.setTextColor(107, 114, 128);
-                    });
-                });
+                        if (limpo.length >= MIN_LEN) {
+                            if (limpo === ultimoCodigo) {
+                                contagemVotos++;
+                            } else {
+                                ultimoCodigo  = limpo;
+                                contagemVotos = 1;
+                            }
 
-                const dataAtual = new Date().toLocaleDateString('pt-BR').replace(/\//g, '-');
-                doc.save(`relatorio_notas_${dataAtual}.pdf`);
+                            cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
 
-                pdfExportado = true;
-                btnLimpar.disabled = false;
-
-                mostrarFeedback('✓ PDF exportado com sucesso!', '#10b981');
-            } catch (error) {
-                console.error('Erro ao exportar PDF:', error);
-                mostrarFeedback('❌ Erro ao exportar PDF', '#ef4444');
+                            if (contagemVotos >= MIN_VOTOS) {
+                                pausarLoop();
+                                mostrarModalConfirmacao(limpo, true);
+                                return;
+                            }
+                        } else {
+                            cameraHint.textContent = '⬡ CÓDIGO DETECTADO – APROXIME MAIS';
+                        }
+                    } else {
+                        cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
+                    }
+                } catch(e) {
+                    // detector.detect pode falhar em frames ruins — ignora e continua
+                }
             }
+
+            rafId = requestAnimationFrame(loop);
         }
 
-        function limparNotas() {
-            if (notasFiscais.length === 0) {
-                mostrarFeedback('❌ Nenhuma nota para limpar', '#ef4444');
-                return;
+        rafId = requestAnimationFrame(loop);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  ENGINE 2 – ZXing-js (fallback JS puro)
+    //  Funciona em qualquer browser moderno
+    // ═══════════════════════════════════════════════════════
+    async function iniciarZXing() {
+        if (typeof ZXing === 'undefined') {
+            mostrarFeedback('❌ ZXing não carregou. Verifique a conexão.', '#c0392b');
+            pararScanner(); return;
+        }
+
+        const hints = new Map();
+        const formats = [
+            ZXing.BarcodeFormat.CODE_128,
+            ZXing.BarcodeFormat.ITF,
+            ZXing.BarcodeFormat.EAN_13,
+            ZXing.BarcodeFormat.EAN_8,
+            ZXing.BarcodeFormat.CODE_39
+        ];
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+
+        const reader = new ZXing.MultiFormatReader();
+        reader.setHints(hints);
+        zxingReader = reader;
+
+        const canvas  = document.createElement('canvas');
+        const ctx     = canvas.getContext('2d', { willReadFrequently: true });
+
+        let ultimoCodigo  = '';
+        let contagemVotos = 0;
+        const MIN_VOTOS   = 3;
+
+        function loop() {
+            if (!scannerAtivo || loopPausado) return;
+
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width  = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+
+                try {
+                    const imgData    = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const luminance  = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
+                    const binary     = new ZXing.HybridBinarizer(luminance);
+                    const bitmap     = new ZXing.BinaryBitmap(binary);
+                    const result     = reader.decode(bitmap);
+                    const raw        = result.getText();
+                    const limpo      = raw.replace(/\D/g, '');
+
+                    // Ignora se ainda está no cooldown do código anterior
+                    if (limpo === cooldownCodigo) { rafId = requestAnimationFrame(loop); return; }
+
+                    if (limpo.length >= MIN_LEN) {
+                        if (limpo === ultimoCodigo) {
+                            contagemVotos++;
+                        } else {
+                            ultimoCodigo  = limpo;
+                            contagemVotos = 1;
+                        }
+
+                        cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
+
+                        if (contagemVotos >= MIN_VOTOS) {
+                            pausarLoop();
+                            mostrarModalConfirmacao(limpo, true);
+                            return;
+                        }
+                    }
+                } catch(e) {
+                    // NotFoundException é normal quando não há código no frame
+                    cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
+                }
             }
 
-            if (confirm('⚠️ Tem certeza que deseja limpar todas as notas fiscais?')) {
-                notasFiscais = [];
+            rafId = requestAnimationFrame(loop);
+        }
+
+        rafId = requestAnimationFrame(loop);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  LEITOR FÍSICO (pistola / USB)
+    // ═══════════════════════════════════════════════════════
+    function capturarTeclaLeitor(e) {
+        const agora = Date.now();
+        if (agora - ultimoKeyTime > 500 && bufferLeitor.length > 0) bufferLeitor = '';
+        ultimoKeyTime = agora;
+
+        if (e.key.length !== 1 && e.key !== 'Enter') return;
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (bufferLeitor.length >= MIN_LEN) finalizarLeituraLeitor(bufferLeitor);
+            return;
+        }
+
+        if (/\d/.test(e.key)) {
+            bufferLeitor += e.key;
+            atualizarDisplayLeitor(bufferLeitor);
+        }
+
+        clearTimeout(timerLeitor);
+        timerLeitor = setTimeout(() => {
+            if (bufferLeitor.length >= MIN_LEN) {
+                finalizarLeituraLeitor(bufferLeitor);
+            } else if (bufferLeitor.length > 0) {
+                barcodeDisplay.value       = '';
+                barcodeDisplay.placeholder = `⚠ INCOMPLETO: ${bufferLeitor.length} dígitos`;
+                setTimeout(() => {
+                    bufferLeitor               = '';
+                    barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
+                }, 2000);
+            }
+        }, PAUSA_LEITOR);
+    }
+
+    function atualizarDisplayLeitor(codigo) {
+        barcodeDisplay.value       = codigo.length > 0 ? codigo : '';
+        barcodeDisplay.placeholder = codigo.length > 0 ? '' : '// AGUARDANDO CÓDIGO //';
+    }
+
+    function finalizarLeituraLeitor(codigo) {
+        const limpo = codigo.replace(/\D/g, '');
+        bufferLeitor               = '';
+        barcodeDisplay.value       = '';
+        barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
+        if (limpo.length < MIN_LEN) return;
+        if (limpo.length !== 44) console.warn(`[LEITOR] ${limpo.length} dígitos:`, limpo);
+        mostrarModalConfirmacao(limpo, false);
+    }
+
+    // Fallback input event
+    barcodeInput.addEventListener('input', function(e) {
+        if (!modoLeitor) return;
+        const val = e.target.value.replace(/\D/g, '');
+        if (val.length > bufferLeitor.length) {
+            bufferLeitor = val;
+            atualizarDisplayLeitor(bufferLeitor);
+            clearTimeout(timerLeitor);
+            timerLeitor = setTimeout(() => {
+                if (bufferLeitor.length >= MIN_LEN) finalizarLeituraLeitor(bufferLeitor);
+            }, PAUSA_LEITOR);
+        }
+    });
+
+    function iniciarLeitorCodigo() {
+        const nomeColaborador = inputNomeColaborador.value.trim();
+        const nomeLoja        = inputNomeLoja.value.trim();
+        if (!nomeColaborador || !nomeLoja) {
+            mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#c0392b'); return;
+        }
+        modoLeitor   = true;
+        bufferLeitor = '';
+        barcodeInputContainer.classList.add('show');
+        btnEscanear.style.display     = 'none';
+        btnLeitorCodigo.style.display = 'none';
+        barcodeInput.value = '';
+        barcodeInput.focus();
+    }
+
+    function pararLeitorCodigo() {
+        modoLeitor   = false;
+        bufferLeitor = '';
+        clearTimeout(timerLeitor);
+        barcodeInputContainer.classList.remove('show');
+        btnEscanear.style.display     = 'flex';
+        btnLeitorCodigo.style.display = 'flex';
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  MODAL + PROCESSAMENTO
+    // ═══════════════════════════════════════════════════════
+    function extrairNumeroNF(c) {
+        if (!c) return null;
+        const s = c.replace(/\D/g, '');
+        if (s.length >= 44) return s.substring(25, 34).replace(/^0+/, '') || s.substring(25, 34);
+        return s;
+    }
+
+    function mostrarModalConfirmacao(codigo, temFoto = false) {
+        const numeroNF        = extrairNumeroNF(codigo);
+        const nomeColaborador = inputNomeColaborador.value.trim();
+        const nomeLoja        = inputNomeLoja.value.trim();
+        codigoAtualConfirmacao = codigo;
+        temFotoAtual           = temFoto;
+        modalColaborador.textContent = nomeColaborador;
+        modalLoja.textContent        = nomeLoja;
+        modalNumeroNF.textContent    = numeroNF || 'Não identificado';
+        const cls = codigo.length === 44 ? 'digitos-ok' : 'digitos-alerta';
+        modalBarcode.innerHTML = `
+            <span class="${cls}">${codigo}</span><br>
+            <span class="len-badge">${codigo.length} dígitos ${codigo.length === 44 ? '✓' : '⚠ esperado 44'}</span>
+        `;
+        document.getElementById('checkFoto').checked = false;
+        modalConfirmacao.classList.add('show');
+        document.body.classList.add('modal-open');
+        btnConfirmar.focus();
+    }
+
+    function fecharModal() {
+        const codigoLido = codigoAtualConfirmacao;
+        modalConfirmacao.classList.remove('show');
+        document.body.classList.remove('modal-open');
+        codigoAtualConfirmacao = null;
+        temFotoAtual           = false;
+        if (modoLeitor) {
+            barcodeInput.focus();
+        } else if (scannerAtivo) {
+            // Câmera estava ativa: retoma com cooldown
+            retomarLoop(codigoLido || '');
+        }
+    }
+
+    function confirmarLeitura() {
+        if (!codigoAtualConfirmacao) return;
+        const comFoto = document.getElementById('checkFoto').checked;
+        processarCodigo(codigoAtualConfirmacao, comFoto);
+        fecharModal();
+    }
+
+    function processarCodigo(codigoBarras, temFoto = false) {
+        const numeroNF        = extrairNumeroNF(codigoBarras);
+        const nomeColaborador = inputNomeColaborador.value.trim();
+        const nomeLoja        = inputNomeLoja.value.trim();
+        if (!numeroNF || !nomeColaborador || !nomeLoja) {
+            mostrarFeedback('❌ Dados inválidos', '#c0392b'); return;
+        }
+        const jaExiste = notasFiscais.some(
+            n => n.numeroNF === numeroNF && n.loja === nomeLoja && n.colaborador === nomeColaborador
+        );
+        if (jaExiste) { mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#d4a017'); return; }
+        const novaEntrada = {
+            id: Date.now(), colaborador: nomeColaborador, loja: nomeLoja,
+            numeroNF, codigoCompleto: codigoBarras, temFoto,
+            dataHora: new Date().toLocaleString('pt-BR', {
+                day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+            })
+        };
+        notasFiscais.unshift(novaEntrada);
+        atualizarLista();
+        mostrarFeedback(`✓ NF ${numeroNF} salva${temFoto ? ' com foto' : ''}!`, '#3a5c1f');
+        salvarNoLocalStorage();
+        salvarNoBackend(novaEntrada);
+        pdfExportado       = false;
+        btnLimpar.disabled = true;
+    }
+
+    // ─── EDITAR LOJA ───────────────────────────────────────
+    let editandoId = null;
+
+    function abrirEditarLoja(id) {
+        const nota = notasFiscais.find(n => String(n.id) === String(id));
+        if (!nota) return;
+        editandoId = nota.id;
+        document.getElementById('editModalNF').textContent          = nota.numeroNF;
+        document.getElementById('editModalColaborador').textContent = nota.colaborador;
+        document.getElementById('editInputLoja').value             = nota.loja;
+        document.getElementById('modalEditarLoja').classList.add('show');
+        document.body.classList.add('modal-open');
+        document.getElementById('editInputLoja').focus();
+    }
+
+    function fecharEditarLoja() {
+        document.getElementById('modalEditarLoja').classList.remove('show');
+        document.body.classList.remove('modal-open');
+        editandoId = null;
+    }
+
+    function salvarEdicaoLoja() {
+        const novaLoja = document.getElementById('editInputLoja').value.trim();
+        if (!novaLoja) { mostrarFeedback('❌ Nome da loja não pode ser vazio', '#c0392b'); return; }
+        const idx = notasFiscais.findIndex(n => n.id === editandoId);
+        if (idx === -1) return;
+        notasFiscais[idx].loja = novaLoja;
+        atualizarLista();
+        salvarNoLocalStorage();
+        fecharEditarLoja();
+        mostrarFeedback('✓ Loja atualizada!', '#3a5c1f');
+    }
+
+    document.getElementById('btnEditCancelar').addEventListener('click', fecharEditarLoja);
+    document.getElementById('btnEditSalvar').addEventListener('click', salvarEdicaoLoja);
+    document.getElementById('editInputLoja').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); salvarEdicaoLoja(); }
+    });
+
+    // ─── GOOGLE APPS SCRIPT ────────────────────────────────
+    // Cole aqui a URL gerada ao implantar seu Apps Script:
+    const APPS_SCRIPT_URL = 'COLE_A_URL_DO_APPS_SCRIPT_AQUI';
+
+    async function salvarNoBackend(nota) {
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') {
+            console.warn('Apps Script URL não configurada. Configure APPS_SCRIPT_URL no código.');
+            return;
+        }
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // necessário para Google Apps Script
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'salvar', nota })
+            });
+        } catch(e) { console.error('Erro ao salvar na planilha Google:', e); }
+    }
+
+    function atualizarLista() {
+        if (!notasFiscais.length) {
+            listaNotas.innerHTML        = '<p class="empty-state">// nenhuma nota escaneada ainda</p>';
+            actionButtons.style.display = 'none';
+            contador.textContent        = '0'; return;
+        }
+        actionButtons.style.display = 'flex';
+        contador.textContent        = notasFiscais.length;
+        listaNotas.innerHTML = notasFiscais.map(nota => `
+            <div class="nota-card">
+                <div class="nota-card-top">
+                    <div class="nota-colaborador">${nota.colaborador}</div>
+                    ${nota.temFoto ? '<span class="camera-badge" title="Acompanha foto">📷</span>' : ''}
+                </div>
+                <div class="nota-loja-row">
+                    <span class="nota-loja">${nota.loja}</span>
+                    <button class="btn-edit-loja" onclick="abrirEditarLoja('${nota.id}')" title="Editar loja">✏️</button>
+                </div>
+                <div class="nota-numero">${nota.numeroNF}</div>
+                <div class="nota-data">${nota.dataHora}</div>
+            </div>
+        `).join('');
+    }
+
+    function mostrarFeedback(msg, cor) {
+        feedback.textContent       = msg;
+        feedback.style.background  = cor;
+        feedback.style.display     = 'block';
+        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+    }
+
+    function salvarNoLocalStorage() { localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais)); }
+
+    async function carregarDoLocalStorage() {
+        // 1. Carrega do localStorage imediatamente (rápido, sem internet)
+        const d = localStorage.getItem('notasFiscais');
+        if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
+
+        // 2. Tenta sincronizar com a Google Planilha (se URL configurada)
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') return;
+        try {
+            mostrarFeedback('⟳ Sincronizando com Google Sheets...', '#2e5a8a');
+            const r = await fetch(APPS_SCRIPT_URL + '?action=listar');
+            if (!r.ok) throw new Error('Resposta invalida');
+            const notas = await r.json();
+            if (Array.isArray(notas) && notas.length > 0) {
+                notasFiscais = notas;
                 atualizarLista();
-                salvarNoLocalStorage();
-                mostrarFeedback('✓ Todas as notas foram removidas', '#10b981');
-                btnLimpar.disabled = true;
-                pdfExportado = false;
+                localStorage.setItem('notasFiscais', JSON.stringify(notas));
+                mostrarFeedback('✓ Sincronizado com Google Sheets!', '#3a5c1f');
+            }
+        } catch(e) {
+            console.warn('Sem conexao com planilha, usando cache local:', e);
+        }
+    }
+
+    async function exportarJSON() {
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', '#c0392b'); return; }
+        try {
+            const blob = new Blob([JSON.stringify(notasFiscais, null, 2)], {type:'application/json'});
+            const url  = URL.createObjectURL(blob);
+            const a    = Object.assign(document.createElement('a'), { href: url, download: `dados_dashboard_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json` });
+            a.click(); URL.revokeObjectURL(url);
+            mostrarFeedback('✓ JSON exportado com sucesso!', '#3a5c1f');
+        } catch(e) { mostrarFeedback('❌ Erro ao exportar', '#c0392b'); }
+    }
+
+    function exportarPDF() {
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', '#c0392b'); return; }
+        try {
+            const doc = new jsPDF();
+            const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+            const porLoja = {};
+            notasFiscais.forEach(n => { if (!porLoja[n.loja]) porLoja[n.loja]=[]; porLoja[n.loja].push(n); });
+            let primeiro = true;
+            Object.keys(porLoja).sort().forEach(loja => {
+                if (!primeiro) doc.addPage(); primeiro = false;
+                const notas = porLoja[loja]; let y = 20;
+                doc.setFontSize(20); doc.setTextColor(74,92,47);
+                doc.text('Relatório de Notas Fiscais', pw/2, y, {align:'center'}); y+=15;
+                doc.setFontSize(16); doc.setTextColor(31,41,55);
+                doc.text(`Loja: ${loja}`, 20, y); y+=10;
+                doc.setFontSize(12); doc.setTextColor(75,85,99);
+                doc.text(`Total de Notas: ${notas.length}`, 20, y); y+=15;
+                doc.setDrawColor(74,92,47); doc.line(20,y,pw-20,y); y+=10;
+                doc.setFontSize(10); doc.setTextColor(107,114,128);
+                notas.forEach((nota,i) => {
+                    if (y>ph-40) { doc.addPage(); y=20; }
+                    doc.text(`${i+1}. NF: ${nota.numeroNF}${nota.temFoto?' [foto]':''}`, 20, y); y+=5;
+                    doc.setFontSize(9); doc.setTextColor(155,160,168);
+                    doc.text(`Colaborador: ${nota.colaborador}`, 25, y); y+=4;
+                    doc.text(`Data: ${nota.dataHora}`, 25, y); y+=8;
+                    doc.setFontSize(10); doc.setTextColor(107,114,128);
+                });
+            });
+            doc.save(`relatorio_notas_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`);
+            pdfExportado       = true;
+            btnLimpar.disabled = false;
+            mostrarFeedback('✓ PDF exportado com sucesso!', '#3a5c1f');
+        } catch(e) { mostrarFeedback('❌ Erro ao exportar PDF', '#c0392b'); }
+    }
+
+    async function limparNotas() {
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para limpar', '#c0392b'); return; }
+        if (confirm('⚠️ Tem certeza que deseja limpar todas as notas fiscais?\n\nIsso também limpará a Google Planilha.')) {
+            notasFiscais = []; atualizarLista(); salvarNoLocalStorage();
+            mostrarFeedback('✓ Todas as notas foram removidas', '#3a5c1f');
+            btnLimpar.disabled = true; pdfExportado = false;
+
+            // Limpa também na planilha Google
+            if (APPS_SCRIPT_URL && APPS_SCRIPT_URL !== 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') {
+                try {
+                    await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'limpar' })
+                    });
+                } catch(e) { console.error('Erro ao limpar planilha:', e); }
             }
         }
+    }
     </script>
 </body>
 </html>
