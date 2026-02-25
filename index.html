@@ -865,6 +865,9 @@
     <script>
     const { jsPDF } = window.jspdf;
 
+    // ─── GOOGLE APPS SCRIPT ────────────────────────────────
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec';
+
     // ─── DOM ───────────────────────────────────────────────
     const inputNomeColaborador  = document.getElementById('inputNomeColaborador');
     const inputNomeLoja         = document.getElementById('inputNomeLoja');
@@ -1394,12 +1397,8 @@
         if (e.key === 'Enter') { e.preventDefault(); salvarEdicaoLoja(); }
     });
 
-    // ─── GOOGLE APPS SCRIPT ────────────────────────────────
-    // Cole aqui a URL gerada ao implantar seu Apps Script:
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec';
-
     async function salvarNoBackend(nota) {
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec') {
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') {
             console.warn('Apps Script URL não configurada. Configure APPS_SCRIPT_URL no código.');
             return;
         }
@@ -1452,7 +1451,7 @@
         if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
 
         // 2. Tenta sincronizar com a Google Planilha (se URL configurada)
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec') return;
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') return;
         try {
             mostrarFeedback('⟳ Sincronizando com Google Sheets...', '#2e5a8a');
             const r = await fetch(APPS_SCRIPT_URL + '?action=listar');
