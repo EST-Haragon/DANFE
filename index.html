@@ -1331,7 +1331,7 @@
         fecharModal();
     }
 
-    function processarCodigo(codigoBarras, temFoto = false) {
+    async function processarCodigo(codigoBarras, temFoto = false) {
         const numeroNF        = extrairNumeroNF(codigoBarras);
         const nomeColaborador = inputNomeColaborador.value.trim();
         const nomeLoja        = inputNomeLoja.value.trim();
@@ -1351,11 +1351,17 @@
         };
         notasFiscais.unshift(novaEntrada);
         atualizarLista();
-        mostrarFeedback(`✓ NF ${numeroNF} salva${temFoto ? ' com foto' : ''}!`, '#3a5c1f');
-        salvarNoLocalStorage();
-        salvarNoBackend(novaEntrada);
         pdfExportado       = false;
         btnLimpar.disabled = true;
+
+        // Salva primário na planilha Google; localStorage só como fallback
+        const salvouNaPlanilha = await salvarNoBackend(novaEntrada);
+        if (salvouNaPlanilha) {
+            mostrarFeedback(`✓ NF ${numeroNF} salva na planilha${temFoto ? ' com foto' : ''}!`, '#3a5c1f');
+        } else {
+            salvarNoLocalStorage();
+            mostrarFeedback(`⚠️ NF ${numeroNF} salva localmente (sem conexão)`, '#d4a017');
+        }
     }
 
     // ─── EDITAR LOJA ───────────────────────────────────────
@@ -1398,18 +1404,18 @@
     });
 
     async function salvarNoBackend(nota) {
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') {
-            console.warn('Apps Script URL não configurada. Configure APPS_SCRIPT_URL no código.');
-            return;
-        }
         try {
             await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // necessário para Google Apps Script
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'salvar', nota })
             });
-        } catch(e) { console.error('Erro ao salvar na planilha Google:', e); }
+            return true; // no-cors não retorna resposta, mas se não jogou erro, chegou
+        } catch(e) {
+            console.error('Erro ao salvar na planilha Google:', e);
+            return false;
+        }
     }
 
     function atualizarLista() {
@@ -1445,27 +1451,38 @@
 
     function salvarNoLocalStorage() { localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais)); }
 
-    async function carregarDoLocalStorage() {
-        // 1. Carrega do localStorage imediatamente (rápido, sem internet)
+    function carregarDoLocalStorage() {
+        // Carrega cache local primeiro para exibir rápido
         const d = localStorage.getItem('notasFiscais');
         if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
+        // Tenta buscar da planilha via JSONP (sem CORS)
+        carregarDaPlanilha();
+    }
 
-        // 2. Tenta sincronizar com a Google Planilha (se URL configurada)
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') return;
-        try {
-            mostrarFeedback('⟳ Sincronizando com Google Sheets...', '#2e5a8a');
-            const r = await fetch(APPS_SCRIPT_URL + '?action=listar');
-            if (!r.ok) throw new Error('Resposta invalida');
-            const notas = await r.json();
+    function carregarDaPlanilha() {
+        mostrarFeedback('⟳ Buscando dados da planilha...', '#2e5a8a');
+        const callbackName = 'jsonpCallback_' + Date.now();
+        window[callbackName] = function(notas) {
+            delete window[callbackName];
+            document.getElementById('jsonpScript')?.remove();
             if (Array.isArray(notas) && notas.length > 0) {
                 notasFiscais = notas;
                 atualizarLista();
                 localStorage.setItem('notasFiscais', JSON.stringify(notas));
-                mostrarFeedback('✓ Sincronizado com Google Sheets!', '#3a5c1f');
+                mostrarFeedback(`✓ ${notas.length} notas carregadas da planilha!`, '#3a5c1f');
+            } else {
+                mostrarFeedback('⬡ Planilha vazia ou sem dados', '#4a5c2f');
             }
-        } catch(e) {
-            console.warn('Sem conexao com planilha, usando cache local:', e);
-        }
+        };
+        const script = document.createElement('script');
+        script.id  = 'jsonpScript';
+        script.src = APPS_SCRIPT_URL + '?action=listar&callback=' + callbackName;
+        script.onerror = function() {
+            delete window[callbackName];
+            script.remove();
+            mostrarFeedback('⚠️ Usando dados locais (sem conexão)', '#d4a017');
+        };
+        document.head.appendChild(script);
     }
 
     async function exportarJSON() {
