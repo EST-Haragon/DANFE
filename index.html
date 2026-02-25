@@ -1452,7 +1452,7 @@
         if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
 
         // 2. Tenta sincronizar com a Google Planilha (se URL configurada)
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'COLE_A_URL_DO_APPS_SCRIPT_AQUI') return;
+        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec') return;
         try {
             mostrarFeedback('⟳ Sincronizando com Google Sheets...', '#2e5a8a');
             const r = await fetch(APPS_SCRIPT_URL + '?action=listar');
