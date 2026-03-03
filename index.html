@@ -590,6 +590,119 @@
             font-family: 'DM Mono', monospace;
         }
 
+        /* ── LOJA SELECTOR ── */
+        .loja-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+
+        .loja-selector::-webkit-scrollbar { width: 4px; }
+        .loja-selector::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+        .loja-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            background: var(--surface2);
+        }
+
+        .loja-option:hover { background: var(--blue-bg); border-color: #93c5fd; }
+
+        .loja-option.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .loja-option input[type="radio"] { display: none; }
+
+        .loja-radio-box {
+            width: 18px; height: 18px;
+            border: 2px solid var(--border2);
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+            background: white;
+        }
+
+        .loja-option.selected .loja-radio-box {
+            border-color: white;
+            background: transparent;
+        }
+
+        .loja-option.selected .loja-radio-box::after {
+            content: '';
+            width: 8px; height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .loja-option-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .loja-selector-loading {
+            color: var(--text3);
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .loja-selector-empty {
+            color: var(--text3);
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .loja-add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .loja-add-input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1.5px solid var(--border2);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--surface2);
+            color: var(--text);
+            outline: none;
+        }
+
+        .loja-add-input:focus { border-color: var(--accent); background: white; }
+
+        .loja-add-btn {
+            padding: 9px 14px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .loja-add-btn:hover { background: var(--accent2); }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 480px) {
             body { padding: 12px; }
@@ -685,8 +798,11 @@
         </div>
 
         <div class="form-group">
-            <label for="inputNomeLoja">🏪 Loja</label>
-            <input type="text" id="inputNomeLoja" placeholder="Nome da loja" autocomplete="off">
+            <label>🏪 Loja</label>
+            <div id="lojaSelector" class="loja-selector">
+                <div class="loja-selector-loading">⟳ Carregando lojas...</div>
+            </div>
+            <input type="hidden" id="inputNomeLoja">
         </div>
 
         <button id="btnEscanear" class="btn-primary">
@@ -740,8 +856,9 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div><!-- /.container #appContainer -->
 
+    <!-- Modals ficam no body, fora do appContainer, para funcionar independente do estado de login -->
     <!-- Modal de Confirmação -->
     <div id="modalConfirmacao" class="modal-confirmacao">
         <div class="modal-content">
@@ -837,7 +954,6 @@
             </div>
         </div>
     </div>
-    </div><!-- end appContainer -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- ZXing fallback para browsers sem BarcodeDetector nativo -->
@@ -898,6 +1014,7 @@
     let ultimoKeyTime  = 0;
 
     // ─── EVENTOS BASE ──────────────────────────────────────
+    // Todos os listeners são safe — elementos existem no DOM (hidden), não causam erros
     btnEscanear.addEventListener('click', iniciarScanner);
     btnLeitorCodigo.addEventListener('click', iniciarLeitorCodigo);
     document.getElementById('btnFecharCamera').addEventListener('click', pararScanner);
@@ -915,11 +1032,8 @@
         if (modoLeitor && !modalConfirmacao.classList.contains('show')) capturarTeclaLeitor(e);
     });
 
-    // (carregarDoLocalStorage e carregarDaPlanilha são chamados após login)
-
     // ═══════════════════════════════════════════════════════
     //  DETECÇÃO DE ENGINE
-    //  Prioridade: BarcodeDetector (nativo) → ZXing (JS)
     // ═══════════════════════════════════════════════════════
     const NATIVE_SUPPORTED = ('BarcodeDetector' in window);
 
@@ -928,17 +1042,16 @@
         engineBadge.className   = 'engine-badge ' + (ok ? 'native' : 'fallback');
     }
 
-    // Mostra a engine disponível ao carregar
-    if (NATIVE_SUPPORTED) {
-        BarcodeDetector.getSupportedFormats().then(fmts => {
-            const temCode128 = fmts.includes('code_128');
-            setEngineBadge(
-                '⬡ NATIVE BARCODE API' + (temCode128 ? ' · CODE128 ✓' : ''),
-                true
-            );
-        }).catch(() => setEngineBadge('⬡ NATIVE BARCODE API', true));
-    } else {
-        setEngineBadge('⬡ ZXING JS (FALLBACK)', false);
+    // Detecta engine assim que o app fica visível (chamado por mostrarScanner)
+    function iniciarEngineBadge() {
+        if (NATIVE_SUPPORTED) {
+            BarcodeDetector.getSupportedFormats().then(fmts => {
+                const temCode128 = fmts.includes('code_128');
+                setEngineBadge('⬡ NATIVE BARCODE API' + (temCode128 ? ' · CODE128 ✓' : ''), true);
+            }).catch(() => setEngineBadge('⬡ NATIVE BARCODE API', true));
+        } else {
+            setEngineBadge('⬡ ZXING JS (FALLBACK)', false);
+        }
     }
 
     // ═══════════════════════════════════════════════════════
@@ -948,7 +1061,7 @@
         const nomeColaborador = inputNomeColaborador.value.trim();
         const nomeLoja        = inputNomeLoja.value.trim();
         if (!nomeColaborador || !nomeLoja) {
-            mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#c0392b');
+            mostrarFeedback('❌ Preencha colaborador e loja primeiro', 'error');
             return;
         }
 
@@ -978,7 +1091,7 @@
             }
         } catch(err) {
             console.error('[CAMERA]', err);
-            mostrarFeedback('❌ Erro ao acessar câmera', '#c0392b');
+            mostrarFeedback('❌ Erro ao acessar câmera', 'error');
             pararScanner();
         }
     }
@@ -1098,7 +1211,7 @@
     // ═══════════════════════════════════════════════════════
     async function iniciarZXing() {
         if (typeof ZXing === 'undefined') {
-            mostrarFeedback('❌ ZXing não carregou. Verifique a conexão.', '#c0392b');
+            mostrarFeedback('❌ ZXing não carregou. Verifique a conexão.', 'error');
             pararScanner(); return;
         }
 
@@ -1241,7 +1354,7 @@
         const nomeColaborador = inputNomeColaborador.value.trim();
         const nomeLoja        = inputNomeLoja.value.trim();
         if (!nomeColaborador || !nomeLoja) {
-            mostrarFeedback('❌ Preencha colaborador e loja primeiro', '#c0392b'); return;
+            mostrarFeedback('❌ Preencha colaborador e loja primeiro', 'error'); return;
         }
         modoLeitor   = true;
         bufferLeitor = '';
@@ -1322,7 +1435,7 @@
         const nomeColaborador = inputNomeColaborador.value.trim();
         const nomeLoja        = inputNomeLoja.value.trim();
         if (!numeroNF || !nomeColaborador || !nomeLoja) {
-            mostrarFeedback('❌ Dados inválidos', '#c0392b'); return;
+            mostrarFeedback('❌ Dados inválidos', 'error'); return;
         }
 
         // Verifica duplicata local
@@ -1367,13 +1480,22 @@
 
     async function confirmarDuplicata() {
         const segundo = document.getElementById('dupInputColaborador').value.trim();
-        if (!segundo) { mostrarFeedback('❌ Digite o nome do 2º colaborador', '#c0392b'); return; }
-        fecharModalDuplicata();
+        if (!segundo) { mostrarFeedback('❌ Digite o nome do 2º colaborador', 'error'); return; }
+
+        // Salva os dados ANTES de fechar o modal (fecharModalDuplicata zeraria pendenteDuplicata)
         if (!pendenteDuplicata) return;
-        const { codigoBarras, temFoto, numeroNF, nomeLoja } = pendenteDuplicata;
-        const colaboradorCombinado = pendenteDuplicata.nomeColaborador + ' + ' + segundo;
-        await salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador: colaboradorCombinado, nomeLoja });
-        pendenteDuplicata = null;
+        const dados = { ...pendenteDuplicata };
+        const colaboradorCombinado = dados.nomeColaborador + ' + ' + segundo;
+
+        fecharModalDuplicata();
+
+        await salvarEntrada({
+            codigoBarras: dados.codigoBarras,
+            temFoto:      dados.temFoto,
+            numeroNF:     dados.numeroNF,
+            nomeColaborador: colaboradorCombinado,
+            nomeLoja:     dados.nomeLoja
+        });
     }
 
     function fecharModalDuplicata() {
@@ -1402,10 +1524,10 @@
 
         const salvouNaPlanilha = await salvarNoBackend(novaEntrada);
         if (salvouNaPlanilha) {
-            mostrarFeedback(`✓ NF ${numeroNF} salva na planilha${temFoto ? ' com foto' : ''}!`, '#3a5c1f');
+            mostrarFeedback(`✓ NF ${numeroNF} salva na planilha${temFoto ? ' com foto' : ''}!`, 'success');
         } else {
             salvarNoLocalStorage();
-            mostrarFeedback(`⚠️ NF ${numeroNF} salva localmente (sem conexão)`, '#d4a017');
+            mostrarFeedback(`⚠️ NF ${numeroNF} salva localmente (sem conexão)`, 'warn');
         }
     }
 
@@ -1415,10 +1537,93 @@
         if (e.key === 'Enter') { e.preventDefault(); confirmarDuplicata(); }
     });
 
-    // ─── EDITAR LOJA ───────────────────────────────────────
-    let editandoId = null;
+    // ─── SELETOR DE LOJAS ──────────────────────────────────
+    let lojasDisponiveis = [];
+
+    async function carregarLojas() {
+        const selector = document.getElementById('lojaSelector');
+        try {
+            const res = await jsonpRequest({ action: 'listarLojas' });
+            lojasDisponiveis = Array.isArray(res) && res.length > 0 ? res : [];
+        } catch(e) {
+            // Fallback: extrai lojas únicas das notas já carregadas
+            lojasDisponiveis = [...new Set(notasFiscais.map(n => n.loja).filter(Boolean))];
+        }
+
+        // Tenta também localStorage
+        const cached = localStorage.getItem('qgk_lojas');
+        if (cached) {
+            try {
+                const cList = JSON.parse(cached);
+                const merged = [...new Set([...lojasDisponiveis, ...cList])];
+                lojasDisponiveis = merged;
+            } catch(e) {}
+        }
+
+        renderLojaSelector();
+    }
+
+    function renderLojaSelector() {
+        const selector = document.getElementById('lojaSelector');
+        const lojaAtual = document.getElementById('inputNomeLoja').value;
+
+        if (!lojasDisponiveis.length) {
+            selector.innerHTML = `
+                <div class="loja-selector-empty">Nenhuma loja cadastrada ainda</div>
+                <div class="loja-add-row">
+                    <input type="text" class="loja-add-input" id="novaLojaInput" placeholder="Nome da nova loja...">
+                    <button class="loja-add-btn" onclick="adicionarLoja()">+ Adicionar</button>
+                </div>`;
+            return;
+        }
+
+        selector.innerHTML = lojasDisponiveis.map((loja, i) => `
+            <label class="loja-option${lojaAtual === loja ? ' selected' : ''}" onclick="selecionarLoja('${loja.replace(/'/g, "\\'")}', this)">
+                <input type="radio" name="lojaRadio" value="${loja}" ${lojaAtual === loja ? 'checked' : ''}>
+                <span class="loja-radio-box"></span>
+                <span class="loja-option-name">${loja}</span>
+            </label>
+        `).join('') + `
+            <div class="loja-add-row">
+                <input type="text" class="loja-add-input" id="novaLojaInput" placeholder="Adicionar nova loja...">
+                <button class="loja-add-btn" onclick="adicionarLoja()">+ Add</button>
+            </div>`;
+    }
+
+    function selecionarLoja(nome, el) {
+        document.getElementById('inputNomeLoja').value = nome;
+        document.querySelectorAll('.loja-option').forEach(o => o.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    async function adicionarLoja() {
+        const inp = document.getElementById('novaLojaInput');
+        const nome = inp.value.trim();
+        if (!nome) return;
+        if (lojasDisponiveis.includes(nome)) {
+            selecionarLoja(nome, document.querySelector(`.loja-option:nth-child(${lojasDisponiveis.indexOf(nome)+1})`));
+            inp.value = '';
+            return;
+        }
+        lojasDisponiveis.push(nome);
+        localStorage.setItem('qgk_lojas', JSON.stringify(lojasDisponiveis));
+        try { await jsonpRequest({ action: 'adicionarLoja', nome }); } catch(e) {}
+        document.getElementById('inputNomeLoja').value = nome;
+        renderLojaSelector();
+        inp.value = '';
+    }
+
+
+
+    document.getElementById('lojaSelector').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.target.id === 'novaLojaInput') {
+            e.preventDefault();
+            adicionarLoja();
+        }
+    });
 
     // ─── SENHA EDIÇÃO LOJA ─────────────────────────────────
+    let editandoId = null;
     const SENHA_KEY = 'qgk_senha_edicao';
 
     function abrirEditarLoja(id) {
@@ -1438,13 +1643,13 @@
 
     async function confirmarSenhaLoja() {
         const senhaDigitada = document.getElementById('inputSenhaLoja').value;
-        if (!senhaDigitada) { mostrarFeedback('❌ Digite a senha', '#c0392b'); return; }
+        if (!senhaDigitada) { mostrarFeedback('❌ Digite a senha', 'error'); return; }
 
         // Verifica via Apps Script
         try {
             const res = await jsonpRequest({ action: 'verificarSenhaEdicao', senha: hashSenhaScanner(senhaDigitada) });
             if (!res || !res.ok) {
-                mostrarFeedback('❌ Senha incorreta!', '#c0392b');
+                mostrarFeedback('❌ Senha incorreta!', 'error');
                 document.getElementById('inputSenhaLoja').value = '';
                 document.getElementById('inputSenhaLoja').focus();
                 return;
@@ -1455,7 +1660,7 @@
             const senhaHash  = hashSenhaScanner(senhaDigitada);
             const senhaPlain = senhaDigitada;
             if (senhaHash !== senhaSalva && senhaPlain !== senhaSalva) {
-                mostrarFeedback('❌ Senha incorreta!', '#c0392b');
+                mostrarFeedback('❌ Senha incorreta!', 'error');
                 document.getElementById('inputSenhaLoja').value = '';
                 return;
             }
@@ -1486,7 +1691,7 @@
 
     async function salvarEdicaoLoja() {
         const novaLoja = document.getElementById('editInputLoja').value.trim();
-        if (!novaLoja) { mostrarFeedback('❌ Nome da loja não pode ser vazio', '#c0392b'); return; }
+        if (!novaLoja) { mostrarFeedback('❌ Nome da loja não pode ser vazio', 'error'); return; }
         const idx = notasFiscais.findIndex(n => n.id === editandoId);
         if (idx === -1) return;
         const nota = notasFiscais[idx];
@@ -1495,14 +1700,14 @@
         atualizarLista();
         salvarNoLocalStorage();
         fecharEditarLoja();
-        mostrarFeedback('✓ Atualizando loja na planilha...', '#3a5c1f');
+        mostrarFeedback('✓ Atualizando loja na planilha...', 'success');
 
         // Sincroniza edição na planilha
         try {
             await jsonpRequest({ action: 'editarLoja', id: nota.id, novaLoja });
-            mostrarFeedback('✓ Loja atualizada na planilha!', '#3a5c1f');
+            mostrarFeedback('✓ Loja atualizada na planilha!', 'success');
         } catch(e) {
-            mostrarFeedback('⚠️ Loja atualizada localmente (sem conexão)', '#d4a017');
+            mostrarFeedback('⚠️ Loja atualizada localmente (sem conexão)', 'warn');
         }
     }
 
@@ -1592,11 +1797,23 @@
         `).join('');
     }
 
-    function mostrarFeedback(msg, cor) {
+    function mostrarFeedback(msg, tipo) {
+        // tipo: 'success' | 'error' | 'info' | 'warn'
+        const cores = {
+            success: { bg: '#059669', txt: 'white' },
+            error:   { bg: '#dc2626', txt: 'white' },
+            info:    { bg: '#2563eb', txt: 'white' },
+            warn:    { bg: '#92400e', txt: 'white' },
+        };
+        // Compatibilidade com chamadas antigas que passavam cor hex direta
+        let bg = tipo, txt = 'white';
+        if (cores[tipo]) { bg = cores[tipo].bg; txt = cores[tipo].txt; }
+
         feedback.textContent       = msg;
-        feedback.style.background  = cor;
+        feedback.style.background  = bg;
+        feedback.style.color       = txt;
         feedback.style.display     = 'block';
-        setTimeout(() => { feedback.style.display = 'none'; }, 3000);
+        setTimeout(() => { feedback.style.display = 'none'; }, 3500);
     }
 
     function salvarNoLocalStorage() { localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais)); }
@@ -1608,34 +1825,34 @@
 
     async function carregarDaPlanilha() {
         try {
-            mostrarFeedback('⟳ Buscando dados da planilha...', '#2e5a8a');
+            mostrarFeedback('⟳ Buscando dados da planilha...', 'info');
             const notas = await jsonpRequest({ action: 'listar' });
             if (Array.isArray(notas) && notas.length > 0) {
                 notasFiscais = notas;
                 atualizarLista();
                 localStorage.setItem('notasFiscais', JSON.stringify(notas));
-                mostrarFeedback(`✓ ${notas.length} notas carregadas da planilha!`, '#3a5c1f');
+                mostrarFeedback(`✓ ${notas.length} notas carregadas da planilha!`, 'success');
             } else {
-                mostrarFeedback('⬡ Planilha vazia', '#4a5c2f');
+                mostrarFeedback('⬡ Planilha vazia', 'info');
             }
         } catch(e) {
-            mostrarFeedback('⚠️ Usando dados locais (sem conexão)', '#d4a017');
+            mostrarFeedback('⚠️ Usando dados locais (sem conexão)', 'warn');
         }
     }
 
     async function exportarJSON() {
-        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', '#c0392b'); return; }
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', 'error'); return; }
         try {
             const blob = new Blob([JSON.stringify(notasFiscais, null, 2)], {type:'application/json'});
             const url  = URL.createObjectURL(blob);
             const a    = Object.assign(document.createElement('a'), { href: url, download: `dados_dashboard_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json` });
             a.click(); URL.revokeObjectURL(url);
-            mostrarFeedback('✓ JSON exportado com sucesso!', '#3a5c1f');
-        } catch(e) { mostrarFeedback('❌ Erro ao exportar', '#c0392b'); }
+            mostrarFeedback('✓ JSON exportado com sucesso!', 'success');
+        } catch(e) { mostrarFeedback('❌ Erro ao exportar', 'error'); }
     }
 
     function exportarPDF() {
-        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', '#c0392b'); return; }
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', 'error'); return; }
         try {
             const doc = new jsPDF();
             const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
@@ -1665,15 +1882,15 @@
             doc.save(`relatorio_notas_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`);
             pdfExportado       = true;
             btnLimpar.disabled = false;
-            mostrarFeedback('✓ PDF exportado com sucesso!', '#3a5c1f');
-        } catch(e) { mostrarFeedback('❌ Erro ao exportar PDF', '#c0392b'); }
+            mostrarFeedback('✓ PDF exportado com sucesso!', 'success');
+        } catch(e) { mostrarFeedback('❌ Erro ao exportar PDF', 'error'); }
     }
 
     async function limparNotas() {
-        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para limpar', '#c0392b'); return; }
+        if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para limpar', 'error'); return; }
         if (confirm('⚠️ Tem certeza que deseja limpar todas as notas fiscais?\n\nIsso também limpará a Google Planilha.')) {
             notasFiscais = []; atualizarLista(); salvarNoLocalStorage();
-            mostrarFeedback('✓ Todas as notas foram removidas', '#3a5c1f');
+            mostrarFeedback('✓ Todas as notas foram removidas', 'success');
             btnLimpar.disabled = true; pdfExportado = false;
             try {
                 await jsonpRequest({ action: 'limpar' });
@@ -1735,42 +1952,36 @@
             inp.style.color      = 'var(--text2)';
             inp.title = 'Nome definido pelo login — faça logout para trocar';
         }
-        const lojaKey = 'qgk_ultima_loja_' + (usuario.email || '');
-        const lojaInp = document.getElementById('inputNomeLoja');
-        if (lojaInp) {
-            const ultimaLoja = localStorage.getItem(lojaKey);
-            if (ultimaLoja) lojaInp.value = ultimaLoja;
-            lojaInp.addEventListener('change', () => {
-                localStorage.setItem(lojaKey, lojaInp.value.trim());
-            });
-        }
+        iniciarEngineBadge();
         carregarDoLocalStorage();
         carregarDaPlanilha();
+        carregarLojas();
     }
 
     function logoutScanner() {
-        // Para câmera e leitor se ativos
         if (scannerAtivo) pararScanner();
         if (modoLeitor) pararLeitorCodigo();
 
-        // Salva a loja antes de sair
-        const lojaInp = document.getElementById('inputNomeLoja');
-        const inp     = document.getElementById('inputNomeColaborador');
-        const sess    = sessionStorage.getItem(SCANNER_SESSION_KEY);
-        if (sess && lojaInp) {
-            try {
-                const u = JSON.parse(sess);
-                localStorage.setItem('qgk_ultima_loja_' + u.email, lojaInp.value.trim());
-            } catch(e) {}
-        }
         sessionStorage.removeItem(SCANNER_SESSION_KEY);
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
         document.getElementById('loginEmail').value  = '';
         document.getElementById('loginSenha').value  = '';
         document.getElementById('loginError').style.display = 'none';
-        if (inp) { inp.value = ''; inp.readOnly = false; inp.style.background = ''; inp.style.color = ''; }
-        notasFiscais = [];
+
+        const inp = document.getElementById('inputNomeColaborador');
+        if (inp) { inp.value = ''; inp.readOnly = false; inp.style.background = ''; inp.style.color = ''; inp.title = ''; }
+
+        // Limpa estado
+        notasFiscais    = [];
+        lojasDisponiveis = [];
+        atualizarLista();
+
+        // Reseta seletor de loja
+        const sel = document.getElementById('lojaSelector');
+        if (sel) sel.innerHTML = '<div class="loja-selector-loading">⟳ Carregando lojas...</div>';
+        const hiddenLoja = document.getElementById('inputNomeLoja');
+        if (hiddenLoja) hiddenLoja.value = '';
     }
 
     // Verifica sessão ao carregar
