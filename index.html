@@ -4,71 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QGK – Scanner DANFE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            --bg:       #f4f5f7;
+            --surface:  #ffffff;
+            --surface2: #f9fafb;
+            --border:   #e5e7eb;
+            --border2:  #d1d5db;
+            --text:     #111827;
+            --text2:    #6b7280;
+            --text3:    #9ca3af;
+            --accent:   #111827;
+            --accent2:  #374151;
+            --green:    #059669;
+            --green-bg: #ecfdf5;
+            --yellow:   #d97706;
+            --yellow-bg:#fffbeb;
+            --red:      #dc2626;
+            --red-bg:   #fef2f2;
+            --blue:     #2563eb;
+            --blue-bg:  #eff6ff;
+            --radius:   12px;
+            --shadow:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md:0 4px 16px rgba(0,0,0,0.08);
+            /* Logo keeps original colors */
+            --neon:  #7fff00;
             --olive: #4a5c2f;
-            --military: #2e3d1a;
-            --dark: #101508;
-            --neon: #7fff00;
             --smoke: #8faa72;
-            --card-bg: #161f0c;
-            --border: rgba(74,92,47,0.45);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         html { overflow-y: scroll; overflow-x: hidden; }
 
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: var(--dark);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cellipse cx='40' cy='28' rx='42' ry='24' fill='%234a5c2f' opacity='0.13'/%3E%3Cellipse cx='140' cy='70' rx='58' ry='28' fill='%232e3d1a' opacity='0.15'/%3E%3Cellipse cx='220' cy='32' rx='44' ry='22' fill='%233d4f1e' opacity='0.1'/%3E%3Cellipse cx='70' cy='150' rx='64' ry='30' fill='%234a5c2f' opacity='0.12'/%3E%3Cellipse cx='195' cy='135' rx='50' ry='28' fill='%232e3d1a' opacity='0.13'/%3E%3Cellipse cx='42' cy='218' rx='55' ry='26' fill='%233d4f1e' opacity='0.11'/%3E%3Cellipse cx='180' cy='225' rx='65' ry='30' fill='%234a5c2f' opacity='0.13'/%3E%3C/svg%3E");
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
         }
 
-        body.modal-open { overflow: hidden; padding-right: 0; }
+        body.modal-open { overflow: hidden; }
 
         /* ── CONTAINER ── */
         .container {
-            max-width: 420px;
+            max-width: 440px;
             margin: 0 auto;
-            background: var(--card-bg);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 2px;
-            padding: 24px;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.75), 0 0 0 1px rgba(127,255,0,0.04);
-            position: relative;
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            box-shadow: var(--shadow-md);
         }
 
-        /* corner brackets */
-        .container::before, .container::after {
-            content: '';
-            position: absolute;
-            width: 18px; height: 18px;
-            border-color: var(--neon);
-            border-style: solid;
-            opacity: 0.35;
-        }
-        .container::before { top: 7px; left: 7px; border-width: 2px 0 0 2px; }
-        .container::after  { bottom: 7px; right: 7px; border-width: 0 2px 2px 0; }
-
-        /* ── LOGO HEADER ── */
+        /* ── LOGO HEADER — MANTIDO ORIGINAL ── */
         .logo-header {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 14px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .logo-hex {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-        }
+        .logo-hex { width: 48px; height: 48px; flex-shrink: 0; }
 
         .logo-text-block {
             display: flex;
@@ -81,25 +82,29 @@
             font-family: 'Black Ops One', cursive;
             font-size: 26px;
             letter-spacing: 5px;
-            color: var(--neon);
-            text-shadow: 0 0 16px rgba(127,255,0,0.35);
+            color: #111827;
         }
 
         .logo-sub {
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 10px;
             letter-spacing: 3px;
-            color: var(--smoke);
+            color: var(--text3);
             text-transform: uppercase;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
         /* ── DIVIDER ── */
-        .divider {
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--olive), transparent);
-            margin-bottom: 20px;
+        .divider { display: none; }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text3);
+            margin-bottom: 6px;
         }
 
         /* ── FORM ── */
@@ -109,152 +114,118 @@
             display: block;
             margin-bottom: 6px;
             font-weight: 600;
-            color: var(--smoke);
+            color: var(--text2);
             font-size: 11px;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
         }
 
         .form-group input {
             width: 100%;
             padding: 11px 14px;
-            border: 1px solid var(--border);
-            border-radius: 1px;
-            font-size: 15px;
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 600;
-            background: rgba(0,0,0,0.45);
-            color: #d4e8b0;
-            transition: all 0.25s;
+            border: 1.5px solid var(--border2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            background: var(--surface2);
+            color: var(--text);
+            transition: all 0.2s;
         }
 
-        .form-group input::placeholder { color: rgba(143,170,114,0.3); }
+        .form-group input::placeholder { color: var(--text3); }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--olive);
-            box-shadow: 0 0 0 2px rgba(74,92,47,0.2), 0 0 10px rgba(127,255,0,0.08);
-            background: rgba(0,0,0,0.6);
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(17,24,39,0.08);
         }
 
         /* ── BUTTONS ── */
         button {
-            font-family: 'Black Ops One', cursive;
+            font-family: 'DM Sans', sans-serif;
             cursor: pointer;
             border: none;
-            border-radius: 1px;
-            font-weight: 400;
-            letter-spacing: 2px;
-            transition: all 0.22s;
+            border-radius: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all 0.18s;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            text-transform: uppercase;
         }
 
         .btn-primary {
             width: 100%;
-            padding: 13px;
-            background: var(--olive);
-            color: var(--neon);
-            font-size: 13px;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            font-size: 14px;
             margin-bottom: 8px;
-            border: 1px solid rgba(127,255,0,0.18);
-            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
         .btn-primary:hover:not(:disabled) {
-            background: #5a7038;
-            box-shadow: 0 0 18px rgba(127,255,0,0.18);
+            background: var(--accent2);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
         .btn-primary:disabled {
-            background: #222;
-            color: #444;
-            border-color: #333;
+            background: var(--border);
+            color: var(--text3);
             cursor: not-allowed;
-            clip-path: none;
         }
 
         .btn-secondary {
             width: 100%;
             padding: 11px;
-            background: transparent;
-            color: var(--smoke);
-            font-size: 12px;
+            background: var(--surface2);
+            color: var(--text2);
+            font-size: 13px;
             margin-bottom: 8px;
-            border: 1px solid var(--border);
-            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            border: 1.5px solid var(--border2);
         }
         .btn-secondary:hover:not(:disabled) {
-            border-color: var(--olive);
-            color: #d4e8b0;
-            background: rgba(74,92,47,0.15);
+            background: var(--border);
+            color: var(--text);
         }
-        .btn-secondary:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            clip-path: none;
-        }
+        .btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .btn-danger {
             width: 100%;
             padding: 11px;
-            background: rgba(192,57,43,0.12);
-            color: #e05a4a;
-            font-size: 12px;
-            border: 1px solid rgba(192,57,43,0.35);
-            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            background: var(--red-bg);
+            color: var(--red);
+            font-size: 13px;
+            border: 1.5px solid #fecaca;
         }
-        .btn-danger:hover:not(:disabled) {
-            background: rgba(192,57,43,0.25);
-            transform: translateY(-1px);
-        }
-        .btn-danger:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-            clip-path: none;
-        }
+        .btn-danger:hover:not(:disabled) { background: #fee2e2; }
+        .btn-danger:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .btn-success {
             width: 100%;
             padding: 11px;
-            background: rgba(74,92,47,0.28);
-            color: var(--neon);
-            font-size: 12px;
+            background: var(--green-bg);
+            color: var(--green);
+            font-size: 13px;
             margin-bottom: 8px;
-            border: 1px solid rgba(127,255,0,0.2);
-            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+            border: 1.5px solid #a7f3d0;
         }
-        .btn-success:hover:not(:disabled) {
-            background: rgba(74,92,47,0.45);
-            box-shadow: 0 0 14px rgba(127,255,0,0.12);
-            transform: translateY(-1px);
-        }
-        .btn-success:disabled {
-            opacity: 0.25;
-            cursor: not-allowed;
-            clip-path: none;
-        }
+        .btn-success:hover:not(:disabled) { background: #d1fae5; }
+        .btn-success:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .btn-close-camera {
             width: 100%;
             padding: 9px;
             margin-top: 8px;
-            background: rgba(0,0,0,0.4);
-            color: var(--smoke);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
-            letter-spacing: 2px;
-            border: 1px solid rgba(143,170,114,0.2);
-            border-radius: 1px;
+            background: var(--surface2);
+            color: var(--text2);
+            font-size: 12px;
+            border: 1.5px solid var(--border2);
+            border-radius: 8px;
         }
-        .btn-close-camera:hover {
-            border-color: rgba(192,57,43,0.5);
-            color: #e05a4a;
-            background: rgba(192,57,43,0.08);
-        }
+        .btn-close-camera:hover { background: var(--red-bg); color: var(--red); border-color: #fecaca; }
 
         .action-buttons {
             display: flex;
@@ -265,24 +236,16 @@
             border-top: 1px solid var(--border);
         }
 
-        .button-group {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-            margin-bottom: 0;
-        }
-        .button-group button { flex: 1; margin: 0; font-size: 11px; }
+        .button-group { display: flex; gap: 8px; width: 100%; }
+        .button-group button { flex: 1; margin: 0; font-size: 12px; }
 
         /* ── CAMERA ── */
-        .camera-container {
-            margin-bottom: 14px;
-            position: relative;
-        }
+        .camera-container { margin-bottom: 14px; position: relative; }
 
         #video {
             width: 100%;
-            border-radius: 1px;
-            border: 2px solid var(--olive);
+            border-radius: 8px;
+            border: 2px solid var(--border2);
             display: block;
             background: #000;
         }
@@ -290,35 +253,33 @@
         .camera-overlay {
             position: absolute;
             top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%,-50%);
             width: 90%; height: 40%;
-            border: 2px solid var(--neon);
-            border-radius: 1px;
-            box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            box-shadow: 0 0 0 9999px rgba(0,0,0,0.45);
             pointer-events: none;
         }
+
         .camera-overlay::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 2px;
-            background: var(--neon);
+            background: var(--accent);
             animation: scan 2s linear infinite;
-            box-shadow: 0 0 10px var(--neon);
         }
-        @keyframes scan {
-            0%, 100% { top: 0; }
-            50% { top: 100%; }
-        }
+
+        @keyframes scan { 0%,100%{top:0} 50%{top:100%} }
 
         .camera-hint {
             position: absolute;
             bottom: 44px; left: 0; right: 0;
             text-align: center;
-            color: var(--neon);
-            font-size: 10px;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 2px;
+            color: white;
+            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 1px;
             padding: 5px;
             background: rgba(0,0,0,0.55);
         }
@@ -330,114 +291,90 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .section-header h2 {
-            font-family: 'Black Ops One', cursive;
+            font-family: 'DM Sans', sans-serif;
             font-size: 13px;
-            font-weight: 400;
-            color: var(--smoke);
-            letter-spacing: 3px;
+            font-weight: 600;
+            color: var(--text2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .contador {
-            background: var(--olive);
-            color: var(--neon);
-            padding: 4px 14px;
-            font-family: 'Black Ops One', cursive;
-            font-size: 13px;
-            letter-spacing: 2px;
-            clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+            background: var(--accent);
+            color: white;
+            padding: 3px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 20px;
+            font-family: 'DM Mono', monospace;
         }
 
-        .lista-notas {
-            max-height: 380px;
-            overflow-y: auto;
-            padding-right: 4px;
-        }
-
+        .lista-notas { max-height: 380px; overflow-y: auto; padding-right: 2px; }
         .lista-notas::-webkit-scrollbar { width: 4px; }
-        .lista-notas::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .lista-notas::-webkit-scrollbar-thumb { background: var(--olive); }
-        .lista-notas::-webkit-scrollbar-thumb:hover { background: var(--neon); }
+        .lista-notas::-webkit-scrollbar-track { background: var(--bg); }
+        .lista-notas::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
         .nota-card {
-            background: rgba(0,0,0,0.3);
+            background: var(--surface2);
             border: 1px solid var(--border);
-            border-left: 3px solid var(--olive);
-            border-radius: 1px;
+            border-left: 3px solid var(--accent);
+            border-radius: 8px;
             padding: 10px 14px;
             margin-bottom: 8px;
-            transition: all 0.25s;
+            transition: all 0.2s;
         }
-        .nota-card:hover {
-            border-left-color: var(--neon);
-            background: rgba(74,92,47,0.1);
-            transform: translateX(2px);
-        }
+        .nota-card:hover { border-left-color: var(--blue); background: var(--blue-bg); transform: translateX(2px); }
 
         .nota-colaborador {
-            font-family: 'Black Ops One', cursive;
-            font-weight: 400;
-            color: #d4e8b0;
-            font-size: 15px;
-            letter-spacing: 1px;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
             margin-bottom: 2px;
         }
 
-        .nota-loja {
-            color: var(--neon);
-            font-weight: 700;
-            font-size: 12px;
-            margin-bottom: 4px;
-            letter-spacing: 1px;
-        }
+        .nota-loja { color: var(--blue); font-weight: 600; font-size: 12px; }
 
         .nota-numero {
-            color: var(--smoke);
-            font-size: 13px;
-            font-weight: 600;
+            color: var(--text2);
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
             margin-bottom: 2px;
-            font-family: 'Share Tech Mono', monospace;
         }
 
         .nota-data {
-            color: rgba(143,170,114,0.55);
+            color: var(--text3);
             font-size: 11px;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .photo-icon { font-size: 12px; }
-
         .empty-state {
             text-align: center;
-            color: rgba(143,170,114,0.3);
+            color: var(--text3);
             padding: 40px 20px;
-            font-style: italic;
-            font-size: 14px;
-            letter-spacing: 1px;
-            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            font-family: 'DM Mono', monospace;
         }
 
         /* ── FEEDBACK ── */
         .feedback {
             display: none;
             padding: 12px 16px;
-            border-radius: 1px;
+            border-radius: 8px;
             margin-bottom: 14px;
-            color: #000;
-            font-weight: 700;
+            color: white;
+            font-weight: 600;
             text-align: center;
-            font-size: 14px;
-            letter-spacing: 1px;
-            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
             animation: slideDown 0.3s ease;
-            clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
         }
+
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-8px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -448,271 +385,272 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.82);
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(4px);
         }
         .modal-confirmacao.show { display: flex; }
 
         .modal-content {
-            background: var(--card-bg);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 2px;
+            border-radius: var(--radius);
             padding: 28px;
             max-width: 400px;
             width: 100%;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.8), 0 0 0 1px rgba(127,255,0,0.06);
-            animation: modalUp 0.28s ease;
-            position: relative;
+            box-shadow: var(--shadow-md);
+            animation: modalUp 0.25s ease;
         }
-        .modal-content::before, .modal-content::after {
-            content: '';
-            position: absolute;
-            width: 14px; height: 14px;
-            border-color: var(--neon);
-            border-style: solid;
-            opacity: 0.4;
-        }
-        .modal-content::before { top: 6px; left: 6px; border-width: 2px 0 0 2px; }
-        .modal-content::after  { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
         @keyframes modalUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(16px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
         .modal-header {
-            font-family: 'Black Ops One', cursive;
-            font-size: 16px;
-            font-weight: 400;
-            color: var(--neon);
-            letter-spacing: 3px;
-            margin-bottom: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+            margin-bottom: 18px;
             text-align: center;
-            text-shadow: 0 0 12px rgba(127,255,0,0.3);
         }
 
         .modal-info {
-            background: rgba(0,0,0,0.4);
+            background: var(--surface2);
             border: 1px solid var(--border);
             padding: 14px;
-            border-radius: 1px;
-            margin-bottom: 16px;
+            border-radius: 8px;
+            margin-bottom: 14px;
         }
 
         .modal-info-item {
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 13px;
         }
         .modal-info-item:last-child { margin-bottom: 0; }
 
         .modal-info-label {
-            color: var(--smoke);
+            color: var(--text3);
             font-weight: 600;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 11px;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .modal-info-value {
-            color: #d4e8b0;
-            font-weight: 700;
-            font-size: 14px;
-        }
+        .modal-info-value { color: var(--text); font-weight: 600; font-size: 13px; }
 
         .modal-barcode {
-            background: rgba(0,0,0,0.5);
-            border: 1px dashed rgba(74,92,47,0.5);
+            background: var(--surface2);
+            border: 1px dashed var(--border2);
             padding: 10px;
-            border-radius: 1px;
+            border-radius: 8px;
             text-align: center;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 11px;
-            color: var(--smoke);
+            color: var(--text2);
             word-break: break-all;
-            margin-bottom: 18px;
-            letter-spacing: 1px;
+            margin-bottom: 16px;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .modal-actions button { flex: 1; padding: 13px; font-size: 13px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-actions button { flex: 1; padding: 12px; font-size: 13px; }
 
         /* ── BARCODE READER ── */
-        .barcode-input-container {
-            display: none;
-            margin-bottom: 14px;
-        }
+        .barcode-input-container { display: none; margin-bottom: 14px; }
         .barcode-input-container.show { display: block; }
 
         .barcode-display {
             width: 100%;
             padding: 12px 14px;
-            border: 2px solid var(--olive);
-            border-radius: 1px;
+            border: 2px solid var(--accent);
+            border-radius: 8px;
             font-size: 15px;
             font-weight: 700;
             text-align: center;
-            background: rgba(0,0,0,0.5);
-            color: var(--neon);
-            font-family: 'Share Tech Mono', monospace;
+            background: var(--surface2);
+            color: var(--accent);
+            font-family: 'DM Mono', monospace;
             margin-bottom: 10px;
             letter-spacing: 2px;
         }
 
         .barcode-hint {
             text-align: center;
-            color: var(--smoke);
+            color: var(--text2);
             font-size: 11px;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 2px;
+            font-family: 'DM Mono', monospace;
+            letter-spacing: 1px;
             padding: 10px;
-            background: rgba(74,92,47,0.12);
+            background: var(--surface2);
             border: 1px solid var(--border);
+            border-radius: 8px;
             animation: pulse 2s infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
 
-        .hidden-barcode-input {
-            position: absolute;
-            left: -9999px;
-            width: 1px; height: 1px;
-        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
+        .hidden-barcode-input { position: absolute; left: -9999px; width: 1px; height: 1px; }
 
-        /* Destaque dos dígitos no modal */
-        .modal-barcode .digitos-ok    { color: var(--neon); font-size: 12px; }
-        .modal-barcode .digitos-alerta{ color: #f0c040; font-size: 12px; }
+        /* ── BARCODE DIGITS ── */
+        .modal-barcode .digitos-ok    { color: var(--green); font-size: 12px; }
+        .modal-barcode .digitos-alerta{ color: var(--yellow); font-size: 12px; }
         .modal-barcode .len-badge {
             display: inline-block; margin-top: 6px; font-size: 10px;
-            letter-spacing: 1px; padding: 2px 8px;
-            background: rgba(74,92,47,0.3); border-radius: 2px; color: var(--smoke);
+            padding: 2px 8px; background: var(--surface2);
+            border-radius: 4px; color: var(--text3);
         }
 
-        /* Engine badge */
+        /* ── ENGINE BADGE ── */
         .engine-badge {
             display: inline-block;
-            font-family: 'Share Tech Mono', monospace;
+            font-family: 'DM Mono', monospace;
             font-size: 10px;
-            letter-spacing: 2px;
-            padding: 4px 12px;
-            border-radius: 1px;
+            letter-spacing: 1px;
+            padding: 5px 12px;
+            border-radius: 20px;
             margin-bottom: 10px;
             width: 100%;
             text-align: center;
+            font-weight: 500;
         }
-        .engine-badge.native   { background: rgba(127,255,0,0.1); color: var(--neon); border: 1px solid rgba(127,255,0,0.3); }
-        .engine-badge.fallback { background: rgba(240,192,64,0.1); color: #f0c040; border: 1px solid rgba(240,192,64,0.3); }
+        .engine-badge.native   { background: var(--green-bg); color: var(--green); border: 1px solid #a7f3d0; }
+        .engine-badge.fallback { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #fde68a; }
 
-        /* Destaque dos dígitos no modal */
-        .modal-barcode .digitos-ok    { color: var(--neon); font-size: 12px; }
-        .modal-barcode .digitos-alerta{ color: #f0c040; font-size: 12px; }
-        .modal-barcode .len-badge {
-            display: inline-block; margin-top: 6px; font-size: 10px;
-            letter-spacing: 1px; padding: 2px 8px;
-            background: rgba(74,92,47,0.3); border-radius: 2px; color: var(--smoke);
-        }
-        /* Checkbox foto no modal */
+        /* ── CHECKBOX FOTO ── */
         .foto-checkbox-label {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 12px 14px;
-            margin-bottom: 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            border-radius: 1px;
+            margin-bottom: 14px;
+            background: var(--surface2);
+            border: 1.5px solid var(--border2);
+            border-radius: 8px;
             cursor: pointer;
             user-select: none;
-            transition: background 0.2s;
+            transition: all 0.15s;
         }
-        .foto-checkbox-label:hover { background: rgba(74,92,47,0.15); }
+        .foto-checkbox-label:hover { background: var(--blue-bg); border-color: #93c5fd; }
         .foto-checkbox-label input[type="checkbox"] { display: none; }
         .foto-checkbox-box {
             width: 20px; height: 20px;
-            border: 2px solid var(--olive);
-            border-radius: 1px;
+            border: 2px solid var(--border2);
+            border-radius: 4px;
             flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-            background: transparent;
+            transition: all 0.15s;
         }
         .foto-checkbox-label input:checked + .foto-checkbox-box {
-            background: var(--olive);
-            border-color: var(--neon);
+            background: var(--accent);
+            border-color: var(--accent);
         }
         .foto-checkbox-label input:checked + .foto-checkbox-box::after {
             content: '✓';
-            color: var(--neon);
+            color: white;
             font-size: 13px;
             font-weight: 700;
             line-height: 1;
         }
-        .foto-checkbox-text {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 13px;
-            color: var(--smoke);
-            letter-spacing: 1px;
-        }
-        .foto-checkbox-label:has(input:checked) .foto-checkbox-text { color: var(--neon); }
+        .foto-checkbox-text { font-size: 13px; color: var(--text2); font-weight: 500; }
+        .foto-checkbox-label:has(input:checked) .foto-checkbox-text { color: var(--text); }
 
-        /* Camera badge na lista */
-        .nota-card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2px;
-        }
-        .camera-badge {
-            font-size: 18px;
-            line-height: 1;
-            filter: drop-shadow(0 0 4px rgba(127,255,0,0.4));
-        }
+        /* ── CAMERA BADGE ── */
+        .nota-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+        .camera-badge { font-size: 16px; }
 
-        /* Linha loja + botão editar */
-        .nota-loja-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
+        /* ── EDIT LOJA ── */
+        .nota-loja-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
         .btn-edit-loja {
             background: none;
             border: none;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             padding: 2px 6px;
-            border-radius: 1px;
-            opacity: 0.45;
-            transition: opacity 0.2s, background 0.2s;
-            letter-spacing: 0;
+            border-radius: 4px;
+            opacity: 0.4;
+            transition: all 0.15s;
             font-family: inherit;
         }
         .nota-card:hover .btn-edit-loja { opacity: 1; }
-        .btn-edit-loja:hover { background: rgba(74,92,47,0.3); opacity: 1; }
+        .btn-edit-loja:hover { background: var(--surface); opacity: 1; }
 
         .enter-hint {
             text-align: center;
-            color: rgba(143,170,114,0.45);
+            color: var(--text3);
             font-size: 11px;
-            margin-top: 12px;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 1px;
+            margin-top: 10px;
+            font-family: 'DM Mono', monospace;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .container { padding: 20px 16px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- ── TELA DE LOGIN ── -->
+    <div id="loginScreen" style="
+        position:fixed;inset:0;background:var(--bg);
+        display:flex;align-items:center;justify-content:center;
+        z-index:9000;padding:20px;">
+        <div style="
+            background:var(--surface);border:1px solid var(--border);
+            border-radius:16px;padding:36px;width:100%;max-width:380px;
+            box-shadow:var(--shadow-md);">
+
+            <!-- Logo no login -->
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;">
+                <svg style="width:40px;height:40px;flex-shrink:0;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="#2e3d1a" stroke="#4a5c2f" stroke-width="2"/>
+                    <polygon points="50,16 80,33 80,67 50,84 20,67 20,33" fill="none" stroke="#4a5c2f" stroke-width="1" opacity="0.5"/>
+                    <text x="50" y="62" text-anchor="middle" font-family="Black Ops One, cursive" font-size="28" fill="#7fff00" letter-spacing="1">QGK</text>
+                </svg>
+                <div>
+                    <div style="font-family:'Black Ops One',cursive;font-size:22px;color:var(--text);letter-spacing:4px;">QGK</div>
+                    <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Scanner DANFE</div>
+                </div>
+            </div>
+
+            <div id="loginError" style="
+                display:none;background:var(--red-bg);color:var(--red);
+                border:1px solid #fecaca;border-radius:8px;
+                padding:10px 14px;font-size:13px;margin-bottom:14px;font-weight:500;"></div>
+
+            <div style="margin-bottom:12px;">
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-family:'DM Mono',monospace;">Email</label>
+                <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email" style="
+                    width:100%;padding:12px 14px;border:1.5px solid var(--border2);
+                    border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;
+                    background:var(--surface2);color:var(--text);outline:none;">
+            </div>
+            <div style="margin-bottom:20px;">
+                <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-family:'DM Mono',monospace;">Senha</label>
+                <input type="password" id="loginSenha" placeholder="••••••••" autocomplete="current-password" style="
+                    width:100%;padding:12px 14px;border:1.5px solid var(--border2);
+                    border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;
+                    background:var(--surface2);color:var(--text);outline:none;">
+            </div>
+            <button id="loginBtn" onclick="fazerLoginScanner()" style="
+                width:100%;padding:13px;background:var(--accent);color:white;
+                border:none;border-radius:10px;font-size:14px;font-weight:600;
+                font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.18s;">
+                Entrar
+            </button>
+        </div>
+    </div>
+
+    <div class="container" id="appContainer" style="display:none;">
 
         <!-- Logo QGK -->
         <div class="logo-header">
@@ -729,6 +667,12 @@
                 <span class="logo-qgk">QGK</span>
                 <span class="logo-sub">Scanner DANFE</span>
             </div>
+            <button onclick="logoutScanner()" title="Sair" style="
+                margin-left:auto;background:var(--surface2);border:1px solid var(--border);
+                border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);
+                cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;">
+                🚪 Sair
+            </button>
         </div>
 
         <div class="divider"></div>
@@ -833,6 +777,42 @@
         </div>
     </div>
 
+    <!-- Modal NF Duplicada -->
+    <div id="modalDuplicada" class="modal-confirmacao">
+        <div class="modal-content">
+            <div class="modal-header" style="color:#f0c040;">⚠️ NOTA JÁ LANÇADA</div>
+            <div class="modal-info" style="margin-bottom:16px;">
+                <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="dupModalNF" class="modal-info-value">-</span></div>
+                <div class="modal-info-item"><span class="modal-info-label">Lançada por</span><span id="dupModalColaborador" class="modal-info-value" style="color:#f0c040;">-</span></div>
+            </div>
+            <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--smoke);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Foi feita por dois colaboradores?</p>
+            <div class="form-group" style="margin-bottom:18px;">
+                <label for="dupInputColaborador">👤 Nome do 2º Colaborador</label>
+                <input type="text" id="dupInputColaborador" placeholder="Nome do segundo colaborador" autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button id="btnDupCancelar" class="btn-danger">✕ Cancelar</button>
+                <button id="btnDupConfirmar" class="btn-success">✓ Adicionar 2º Colaborador</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Senha Edição Loja -->
+    <div id="modalSenhaLoja" class="modal-confirmacao">
+        <div class="modal-content">
+            <div class="modal-header">🔒 SENHA DE EDIÇÃO</div>
+            <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--smoke);margin-bottom:16px;text-align:center;">Digite a senha para editar o nome da loja</p>
+            <div class="form-group" style="margin-bottom:18px;">
+                <label for="inputSenhaLoja">🔑 Senha</label>
+                <input type="password" id="inputSenhaLoja" placeholder="Digite a senha..." autocomplete="off">
+            </div>
+            <div class="modal-actions">
+                <button id="btnSenhaCancelar" class="btn-danger">✕ Cancelar</button>
+                <button id="btnSenhaConfirmar" class="btn-success">✓ Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal editar loja -->
     <div id="modalEditarLoja" class="modal-confirmacao">
         <div class="modal-content">
@@ -857,6 +837,7 @@
             </div>
         </div>
     </div>
+    </div><!-- end appContainer -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- ZXing fallback para browsers sem BarcodeDetector nativo -->
@@ -934,7 +915,7 @@
         if (modoLeitor && !modalConfirmacao.classList.contains('show')) capturarTeclaLeitor(e);
     });
 
-    carregarDoLocalStorage();
+    // (carregarDoLocalStorage e carregarDaPlanilha são chamados após login)
 
     // ═══════════════════════════════════════════════════════
     //  DETECÇÃO DE ENGINE
@@ -1317,9 +1298,14 @@
         codigoAtualConfirmacao = null;
         temFotoAtual           = false;
         if (modoLeitor) {
-            barcodeInput.focus();
+            // Limpa completamente o buffer e o display após confirmação
+            bufferLeitor = '';
+            clearTimeout(timerLeitor);
+            barcodeDisplay.value       = '';
+            barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
+            barcodeInput.value         = '';
+            setTimeout(() => barcodeInput.focus(), 100);
         } else if (scannerAtivo) {
-            // Câmera estava ativa: retoma com cooldown
             retomarLoop(codigoLido || '');
         }
     }
@@ -1338,23 +1324,82 @@
         if (!numeroNF || !nomeColaborador || !nomeLoja) {
             mostrarFeedback('❌ Dados inválidos', '#c0392b'); return;
         }
-        const jaExiste = notasFiscais.some(
-            n => n.numeroNF === numeroNF && n.loja === nomeLoja && n.colaborador === nomeColaborador
+
+        // Verifica duplicata local
+        const jaExisteLocal = notasFiscais.some(
+            n => n.numeroNF === numeroNF && n.loja === nomeLoja
         );
-        if (jaExiste) { mostrarFeedback('⚠️ Esta nota já foi escaneada!', '#d4a017'); return; }
+
+        // Verifica duplicata na planilha via JSONP
+        let jaExistePlanilha = false;
+        let colaboradorExistente = '';
+        try {
+            const resultado = await jsonpRequest({ action: 'verificar', numeroNF, loja: nomeLoja });
+            if (resultado && resultado.existe) {
+                jaExistePlanilha = true;
+                colaboradorExistente = resultado.colaborador || '';
+            }
+        } catch(e) {
+            // Se falhar a verificação, usa só o cache local
+            jaExistePlanilha = jaExisteLocal;
+            colaboradorExistente = jaExisteLocal
+                ? (notasFiscais.find(n => n.numeroNF === numeroNF && n.loja === nomeLoja)?.colaborador || '')
+                : '';
+        }
+
+        if (jaExistePlanilha || jaExisteLocal) {
+            // Abre modal de duplicata
+            document.getElementById('dupModalNF').textContent = numeroNF;
+            document.getElementById('dupModalColaborador').textContent = colaboradorExistente || nomeColaborador;
+            document.getElementById('dupInputColaborador').value = '';
+            document.getElementById('modalDuplicada').classList.add('show');
+            document.body.classList.add('modal-open');
+
+            // Guarda contexto para o callback do modal
+            pendenteDuplicata = { codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja };
+            return;
+        }
+
+        await salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja });
+    }
+
+    let pendenteDuplicata = null;
+
+    async function confirmarDuplicata() {
+        const segundo = document.getElementById('dupInputColaborador').value.trim();
+        if (!segundo) { mostrarFeedback('❌ Digite o nome do 2º colaborador', '#c0392b'); return; }
+        fecharModalDuplicata();
+        if (!pendenteDuplicata) return;
+        const { codigoBarras, temFoto, numeroNF, nomeLoja } = pendenteDuplicata;
+        const colaboradorCombinado = pendenteDuplicata.nomeColaborador + ' + ' + segundo;
+        await salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador: colaboradorCombinado, nomeLoja });
+        pendenteDuplicata = null;
+    }
+
+    function fecharModalDuplicata() {
+        document.getElementById('modalDuplicada').classList.remove('show');
+        document.body.classList.remove('modal-open');
+        pendenteDuplicata = null;
+        if (modoLeitor) {
+            bufferLeitor = '';
+            barcodeDisplay.value = '';
+            barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
+            barcodeInput.value = '';
+            barcodeInput.focus();
+        }
+    }
+
+    async function salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja }) {
         const novaEntrada = {
             id: Date.now(), colaborador: nomeColaborador, loja: nomeLoja,
             numeroNF, codigoCompleto: codigoBarras, temFoto,
-            dataHora: new Date().toLocaleString('pt-BR', {
-                day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
-            })
+            dataHora: new Date().toISOString()
         };
         notasFiscais.unshift(novaEntrada);
         atualizarLista();
         pdfExportado       = false;
         btnLimpar.disabled = true;
 
-        // Salva primário na planilha Google; localStorage só como fallback
         const salvouNaPlanilha = await salvarNoBackend(novaEntrada);
         if (salvouNaPlanilha) {
             mostrarFeedback(`✓ NF ${numeroNF} salva na planilha${temFoto ? ' com foto' : ''}!`, '#3a5c1f');
@@ -1364,13 +1409,47 @@
         }
     }
 
+    document.getElementById('btnDupCancelar').addEventListener('click', fecharModalDuplicata);
+    document.getElementById('btnDupConfirmar').addEventListener('click', confirmarDuplicata);
+    document.getElementById('dupInputColaborador').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); confirmarDuplicata(); }
+    });
+
     // ─── EDITAR LOJA ───────────────────────────────────────
     let editandoId = null;
+
+    // ─── SENHA EDIÇÃO LOJA ─────────────────────────────────
+    const SENHA_KEY = 'qgk_senha_edicao';
 
     function abrirEditarLoja(id) {
         const nota = notasFiscais.find(n => String(n.id) === String(id));
         if (!nota) return;
         editandoId = nota.id;
+        // Abre modal de senha primeiro
+        document.getElementById('inputSenhaLoja').value = '';
+        document.getElementById('modalSenhaLoja').classList.add('show');
+        document.body.classList.add('modal-open');
+        document.getElementById('inputSenhaLoja').focus();
+    }
+
+    function fecharSenhaLoja() {
+        document.getElementById('modalSenhaLoja').classList.remove('show');
+        document.body.classList.remove('modal-open');
+    }
+
+    function confirmarSenhaLoja() {
+        const senhaDigitada = document.getElementById('inputSenhaLoja').value;
+        const senhaSalva    = localStorage.getItem(SENHA_KEY) || '1234';
+        if (senhaDigitada !== senhaSalva) {
+            mostrarFeedback('❌ Senha incorreta!', '#c0392b');
+            document.getElementById('inputSenhaLoja').value = '';
+            document.getElementById('inputSenhaLoja').focus();
+            return;
+        }
+        fecharSenhaLoja();
+        // Abre modal de edição
+        const nota = notasFiscais.find(n => n.id === editandoId);
+        if (!nota) return;
         document.getElementById('editModalNF').textContent          = nota.numeroNF;
         document.getElementById('editModalColaborador').textContent = nota.colaborador;
         document.getElementById('editInputLoja').value             = nota.loja;
@@ -1379,22 +1458,38 @@
         document.getElementById('editInputLoja').focus();
     }
 
+    document.getElementById('btnSenhaCancelar').addEventListener('click', fecharSenhaLoja);
+    document.getElementById('btnSenhaConfirmar').addEventListener('click', confirmarSenhaLoja);
+    document.getElementById('inputSenhaLoja').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); confirmarSenhaLoja(); }
+    });
+
     function fecharEditarLoja() {
         document.getElementById('modalEditarLoja').classList.remove('show');
         document.body.classList.remove('modal-open');
         editandoId = null;
     }
 
-    function salvarEdicaoLoja() {
+    async function salvarEdicaoLoja() {
         const novaLoja = document.getElementById('editInputLoja').value.trim();
         if (!novaLoja) { mostrarFeedback('❌ Nome da loja não pode ser vazio', '#c0392b'); return; }
         const idx = notasFiscais.findIndex(n => n.id === editandoId);
         if (idx === -1) return;
+        const nota = notasFiscais[idx];
+        const lojaAntiga = nota.loja;
         notasFiscais[idx].loja = novaLoja;
         atualizarLista();
         salvarNoLocalStorage();
         fecharEditarLoja();
-        mostrarFeedback('✓ Loja atualizada!', '#3a5c1f');
+        mostrarFeedback('✓ Atualizando loja na planilha...', '#3a5c1f');
+
+        // Sincroniza edição na planilha
+        try {
+            await jsonpRequest({ action: 'editarLoja', id: nota.id, novaLoja });
+            mostrarFeedback('✓ Loja atualizada na planilha!', '#3a5c1f');
+        } catch(e) {
+            mostrarFeedback('⚠️ Loja atualizada localmente (sem conexão)', '#d4a017');
+        }
     }
 
     document.getElementById('btnEditCancelar').addEventListener('click', fecharEditarLoja);
@@ -1562,6 +1657,95 @@
             } catch(e) { console.error('Erro ao limpar planilha:', e); }
         }
     }
+    // ─── AUTH ────────────────────────────────────────────────
+    const SCANNER_SESSION_KEY = 'qgk_scanner_session';
+
+    function hashSenhaScanner(s) {
+        let h = 0;
+        for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+        return 'h' + Math.abs(h).toString(36);
+    }
+
+    async function fazerLoginScanner() {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const senha = document.getElementById('loginSenha').value;
+        const errEl = document.getElementById('loginError');
+        const btn   = document.getElementById('loginBtn');
+
+        if (!email || !senha) { mostrarErroScanner('Preencha email e senha.'); return; }
+
+        btn.disabled = true;
+        btn.textContent = 'Verificando...';
+        errEl.style.display = 'none';
+
+        try {
+            const res = await jsonpRequest({ action: 'login', email, senha: hashSenhaScanner(senha) });
+            if (res && res.ok) {
+                const usuario = { nome: res.nome, email: res.email, role: res.role };
+                sessionStorage.setItem(SCANNER_SESSION_KEY, JSON.stringify(usuario));
+                mostrarScanner(usuario);
+            } else {
+                mostrarErroScanner(res?.erro || 'Email ou senha incorretos.');
+            }
+        } catch(e) {
+            mostrarErroScanner('Sem conexão. Verifique a internet.');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+    }
+
+    function mostrarErroScanner(msg) {
+        const el = document.getElementById('loginError');
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+
+    function mostrarScanner(usuario) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'block';
+        // Pré-preenche o nome do colaborador
+        if (usuario.nome) {
+            inputNomeColaborador.value = usuario.nome;
+            inputNomeColaborador.readOnly = true;
+            inputNomeColaborador.style.background = 'var(--surface2)';
+            inputNomeColaborador.style.color = 'var(--text2)';
+            inputNomeColaborador.title = 'Nome definido pelo login';
+        }
+        carregarDoLocalStorage();
+        carregarDaPlanilha();
+    }
+
+    function logoutScanner() {
+        sessionStorage.removeItem(SCANNER_SESSION_KEY);
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('appContainer').style.display = 'none';
+        document.getElementById('loginEmail').value = '';
+        document.getElementById('loginSenha').value = '';
+        document.getElementById('loginError').style.display = 'none';
+        inputNomeColaborador.value = '';
+        inputNomeColaborador.readOnly = false;
+    }
+
+    // Verifica sessão ao carregar
+    (function() {
+        // Enter no login
+        ['loginEmail','loginSenha'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLoginScanner(); });
+        });
+
+        const sess = sessionStorage.getItem(SCANNER_SESSION_KEY);
+        if (sess) {
+            try {
+                const u = JSON.parse(sess);
+                mostrarScanner(u);
+                return;
+            } catch(e) {}
+        }
+        // Sem sessão — login screen já visível por padrão
+    })();
+
     </script>
 </body>
 </html>
