@@ -785,7 +785,7 @@
                 <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="dupModalNF" class="modal-info-value">-</span></div>
                 <div class="modal-info-item"><span class="modal-info-label">Lançada por</span><span id="dupModalColaborador" class="modal-info-value" style="color:#f0c040;">-</span></div>
             </div>
-            <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--smoke);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Foi feita por dois colaboradores?</p>
+            <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Foi feita por dois colaboradores?</p>
             <div class="form-group" style="margin-bottom:18px;">
                 <label for="dupInputColaborador">👤 Nome do 2º Colaborador</label>
                 <input type="text" id="dupInputColaborador" placeholder="Nome do segundo colaborador" autocomplete="off">
@@ -801,7 +801,7 @@
     <div id="modalSenhaLoja" class="modal-confirmacao">
         <div class="modal-content">
             <div class="modal-header">🔒 SENHA DE EDIÇÃO</div>
-            <p style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--smoke);margin-bottom:16px;text-align:center;">Digite a senha para editar o nome da loja</p>
+            <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;text-align:center;">Digite a senha para editar o nome da loja</p>
             <div class="form-group" style="margin-bottom:18px;">
                 <label for="inputSenhaLoja">🔑 Senha</label>
                 <input type="password" id="inputSenhaLoja" placeholder="Digite a senha..." autocomplete="off">
@@ -1425,11 +1425,10 @@
         const nota = notasFiscais.find(n => String(n.id) === String(id));
         if (!nota) return;
         editandoId = nota.id;
-        // Abre modal de senha primeiro
         document.getElementById('inputSenhaLoja').value = '';
         document.getElementById('modalSenhaLoja').classList.add('show');
         document.body.classList.add('modal-open');
-        document.getElementById('inputSenhaLoja').focus();
+        setTimeout(() => document.getElementById('inputSenhaLoja').focus(), 100);
     }
 
     function fecharSenhaLoja() {
@@ -1437,17 +1436,32 @@
         document.body.classList.remove('modal-open');
     }
 
-    function confirmarSenhaLoja() {
+    async function confirmarSenhaLoja() {
         const senhaDigitada = document.getElementById('inputSenhaLoja').value;
-        const senhaSalva    = localStorage.getItem(SENHA_KEY) || '1234';
-        if (senhaDigitada !== senhaSalva) {
-            mostrarFeedback('❌ Senha incorreta!', '#c0392b');
-            document.getElementById('inputSenhaLoja').value = '';
-            document.getElementById('inputSenhaLoja').focus();
-            return;
+        if (!senhaDigitada) { mostrarFeedback('❌ Digite a senha', '#c0392b'); return; }
+
+        // Verifica via Apps Script
+        try {
+            const res = await jsonpRequest({ action: 'verificarSenhaEdicao', senha: hashSenhaScanner(senhaDigitada) });
+            if (!res || !res.ok) {
+                mostrarFeedback('❌ Senha incorreta!', '#c0392b');
+                document.getElementById('inputSenhaLoja').value = '';
+                document.getElementById('inputSenhaLoja').focus();
+                return;
+            }
+        } catch(e) {
+            // Fallback: verifica no localStorage (quando offline)
+            const senhaSalva = localStorage.getItem(SENHA_KEY) || '1234';
+            const senhaHash  = hashSenhaScanner(senhaDigitada);
+            const senhaPlain = senhaDigitada;
+            if (senhaHash !== senhaSalva && senhaPlain !== senhaSalva) {
+                mostrarFeedback('❌ Senha incorreta!', '#c0392b');
+                document.getElementById('inputSenhaLoja').value = '';
+                return;
+            }
         }
+
         fecharSenhaLoja();
-        // Abre modal de edição
         const nota = notasFiscais.find(n => n.id === editandoId);
         if (!nota) return;
         document.getElementById('editModalNF').textContent          = nota.numeroNF;
@@ -1544,6 +1558,16 @@
         }
     }
 
+    function formatarDataScanner(d) {
+        if (!d) return '–';
+        try {
+            if (String(d).includes('T')) {
+                return new Date(d).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+            }
+            return String(d);
+        } catch { return String(d); }
+    }
+
     function atualizarLista() {
         if (!notasFiscais.length) {
             listaNotas.innerHTML        = '<p class="empty-state">// nenhuma nota escaneada ainda</p>';
@@ -1563,7 +1587,7 @@
                     <button class="btn-edit-loja" onclick="abrirEditarLoja('${nota.id}')" title="Editar loja">✏️</button>
                 </div>
                 <div class="nota-numero">${nota.numeroNF}</div>
-                <div class="nota-data">${nota.dataHora}</div>
+                <div class="nota-data">${formatarDataScanner(nota.dataHora)}</div>
             </div>
         `).join('');
     }
@@ -1580,7 +1604,6 @@
     function carregarDoLocalStorage() {
         const d = localStorage.getItem('notasFiscais');
         if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
-        carregarDaPlanilha();
     }
 
     async function carregarDaPlanilha() {
@@ -1704,27 +1727,50 @@
     function mostrarScanner(usuario) {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('appContainer').style.display = 'block';
-        // Pré-preenche o nome do colaborador
-        if (usuario.nome) {
-            inputNomeColaborador.value = usuario.nome;
-            inputNomeColaborador.readOnly = true;
-            inputNomeColaborador.style.background = 'var(--surface2)';
-            inputNomeColaborador.style.color = 'var(--text2)';
-            inputNomeColaborador.title = 'Nome definido pelo login';
+        const inp = document.getElementById('inputNomeColaborador');
+        if (inp && usuario.nome) {
+            inp.value    = usuario.nome;
+            inp.readOnly = true;
+            inp.style.background = 'var(--surface2)';
+            inp.style.color      = 'var(--text2)';
+            inp.title = 'Nome definido pelo login — faça logout para trocar';
+        }
+        const lojaKey = 'qgk_ultima_loja_' + (usuario.email || '');
+        const lojaInp = document.getElementById('inputNomeLoja');
+        if (lojaInp) {
+            const ultimaLoja = localStorage.getItem(lojaKey);
+            if (ultimaLoja) lojaInp.value = ultimaLoja;
+            lojaInp.addEventListener('change', () => {
+                localStorage.setItem(lojaKey, lojaInp.value.trim());
+            });
         }
         carregarDoLocalStorage();
         carregarDaPlanilha();
     }
 
     function logoutScanner() {
+        // Para câmera e leitor se ativos
+        if (scannerAtivo) pararScanner();
+        if (modoLeitor) pararLeitorCodigo();
+
+        // Salva a loja antes de sair
+        const lojaInp = document.getElementById('inputNomeLoja');
+        const inp     = document.getElementById('inputNomeColaborador');
+        const sess    = sessionStorage.getItem(SCANNER_SESSION_KEY);
+        if (sess && lojaInp) {
+            try {
+                const u = JSON.parse(sess);
+                localStorage.setItem('qgk_ultima_loja_' + u.email, lojaInp.value.trim());
+            } catch(e) {}
+        }
         sessionStorage.removeItem(SCANNER_SESSION_KEY);
         document.getElementById('loginScreen').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
-        document.getElementById('loginEmail').value = '';
-        document.getElementById('loginSenha').value = '';
+        document.getElementById('loginEmail').value  = '';
+        document.getElementById('loginSenha').value  = '';
         document.getElementById('loginError').style.display = 'none';
-        inputNomeColaborador.value = '';
-        inputNomeColaborador.readOnly = false;
+        if (inp) { inp.value = ''; inp.readOnly = false; inp.style.background = ''; inp.style.color = ''; }
+        notasFiscais = [];
     }
 
     // Verifica sessão ao carregar
