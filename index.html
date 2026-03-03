@@ -665,43 +665,10 @@
             color: var(--text3);
             font-size: 12px;
             font-family: 'DM Mono', monospace;
-            padding: 8px;
+            padding: 12px;
             text-align: center;
+            line-height: 1.8;
         }
-
-        .loja-add-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 6px;
-        }
-
-        .loja-add-input {
-            flex: 1;
-            padding: 9px 12px;
-            border: 1.5px solid var(--border2);
-            border-radius: 8px;
-            font-size: 13px;
-            font-family: 'DM Sans', sans-serif;
-            background: var(--surface2);
-            color: var(--text);
-            outline: none;
-        }
-
-        .loja-add-input:focus { border-color: var(--accent); background: white; }
-
-        .loja-add-btn {
-            padding: 9px 14px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .loja-add-btn:hover { background: var(--accent2); }
 
         /* ── RESPONSIVE ── */
         @media (max-width: 480px) {
@@ -1569,25 +1536,20 @@
 
         if (!lojasDisponiveis.length) {
             selector.innerHTML = `
-                <div class="loja-selector-empty">Nenhuma loja cadastrada ainda</div>
-                <div class="loja-add-row">
-                    <input type="text" class="loja-add-input" id="novaLojaInput" placeholder="Nome da nova loja...">
-                    <button class="loja-add-btn" onclick="adicionarLoja()">+ Adicionar</button>
+                <div class="loja-selector-empty">
+                    Nenhuma loja cadastrada.<br>
+                    <span style="font-size:11px;">Acesse o Dashboard → Lojas para cadastrar.</span>
                 </div>`;
             return;
         }
 
-        selector.innerHTML = lojasDisponiveis.map((loja, i) => `
+        selector.innerHTML = lojasDisponiveis.map(loja => `
             <label class="loja-option${lojaAtual === loja ? ' selected' : ''}" onclick="selecionarLoja('${loja.replace(/'/g, "\\'")}', this)">
                 <input type="radio" name="lojaRadio" value="${loja}" ${lojaAtual === loja ? 'checked' : ''}>
                 <span class="loja-radio-box"></span>
                 <span class="loja-option-name">${loja}</span>
             </label>
-        `).join('') + `
-            <div class="loja-add-row">
-                <input type="text" class="loja-add-input" id="novaLojaInput" placeholder="Adicionar nova loja...">
-                <button class="loja-add-btn" onclick="adicionarLoja()">+ Add</button>
-            </div>`;
+        `).join('');
     }
 
     function selecionarLoja(nome, el) {
@@ -1595,32 +1557,6 @@
         document.querySelectorAll('.loja-option').forEach(o => o.classList.remove('selected'));
         el.classList.add('selected');
     }
-
-    async function adicionarLoja() {
-        const inp = document.getElementById('novaLojaInput');
-        const nome = inp.value.trim();
-        if (!nome) return;
-        if (lojasDisponiveis.includes(nome)) {
-            selecionarLoja(nome, document.querySelector(`.loja-option:nth-child(${lojasDisponiveis.indexOf(nome)+1})`));
-            inp.value = '';
-            return;
-        }
-        lojasDisponiveis.push(nome);
-        localStorage.setItem('qgk_lojas', JSON.stringify(lojasDisponiveis));
-        try { await jsonpRequest({ action: 'adicionarLoja', nome }); } catch(e) {}
-        document.getElementById('inputNomeLoja').value = nome;
-        renderLojaSelector();
-        inp.value = '';
-    }
-
-
-
-    document.getElementById('lojaSelector').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && e.target.id === 'novaLojaInput') {
-            e.preventDefault();
-            adicionarLoja();
-        }
-    });
 
     // ─── SENHA EDIÇÃO LOJA ─────────────────────────────────
     let editandoId = null;
