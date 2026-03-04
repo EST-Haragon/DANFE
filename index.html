@@ -1508,25 +1508,22 @@
     let lojasDisponiveis = [];
 
     async function carregarLojas() {
-        const selector = document.getElementById('lojaSelector');
         try {
             const res = await jsonpRequest({ action: 'listarLojas' });
-            lojasDisponiveis = Array.isArray(res) && res.length > 0 ? res : [];
+            lojasDisponiveis = Array.isArray(res) ? res : [];
         } catch(e) {
-            // Fallback: extrai lojas únicas das notas já carregadas
-            lojasDisponiveis = [...new Set(notasFiscais.map(n => n.loja).filter(Boolean))];
+            // Sem conexão: fallback para cache local
+            const cached = localStorage.getItem('qgk_lojas_cache');
+            if (cached) {
+                try { lojasDisponiveis = JSON.parse(cached); } catch(e2) { lojasDisponiveis = []; }
+            } else {
+                lojasDisponiveis = [];
+            }
         }
-
-        // Tenta também localStorage
-        const cached = localStorage.getItem('qgk_lojas');
-        if (cached) {
-            try {
-                const cList = JSON.parse(cached);
-                const merged = [...new Set([...lojasDisponiveis, ...cList])];
-                lojasDisponiveis = merged;
-            } catch(e) {}
+        // Atualiza cache local com a lista da planilha (para uso offline)
+        if (lojasDisponiveis.length) {
+            localStorage.setItem('qgk_lojas_cache', JSON.stringify(lojasDisponiveis));
         }
-
         renderLojaSelector();
     }
 
@@ -1631,7 +1628,6 @@
         const idx = notasFiscais.findIndex(n => n.id === editandoId);
         if (idx === -1) return;
         const nota = notasFiscais[idx];
-        const lojaAntiga = nota.loja;
         notasFiscais[idx].loja = novaLoja;
         atualizarLista();
         salvarNoLocalStorage();
@@ -1702,10 +1698,16 @@
     function formatarDataScanner(d) {
         if (!d) return '–';
         try {
-            if (String(d).includes('T')) {
-                return new Date(d).toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+            const s = String(d);
+            if (s.includes('T') && s.includes('Z')) {
+                return new Date(s).toLocaleString('pt-BR', {
+                    timeZone: 'America/Sao_Paulo',
+                    day:'2-digit', month:'2-digit', year:'numeric',
+                    hour:'2-digit', minute:'2-digit'
+                });
             }
-            return String(d);
+            if (s.match(/^\d{2}\/\d{2}\/\d{4}/)) return s.substring(0, 16);
+            return s;
         } catch { return String(d); }
     }
 
@@ -1764,9 +1766,12 @@
             mostrarFeedback('⟳ Buscando dados da planilha...', 'info');
             const notas = await jsonpRequest({ action: 'listar' });
             if (Array.isArray(notas) && notas.length > 0) {
-                notasFiscais = notas;
+                // Merge: mantém notas locais que ainda não foram enviadas (id não existe na planilha)
+                const idsNaPlanilha = new Set(notas.map(n => String(n.id)));
+                const apenasLocais = notasFiscais.filter(n => !idsNaPlanilha.has(String(n.id)));
+                notasFiscais = [...apenasLocais, ...notas];
                 atualizarLista();
-                localStorage.setItem('notasFiscais', JSON.stringify(notas));
+                localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
                 mostrarFeedback(`✓ ${notas.length} notas carregadas da planilha!`, 'success');
             } else {
                 mostrarFeedback('⬡ Planilha vazia', 'info');
