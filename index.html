@@ -867,16 +867,16 @@
             <div class="modal-header" style="color:#f0c040;">⚠️ NOTA JÁ LANÇADA</div>
             <div class="modal-info" style="margin-bottom:16px;">
                 <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="dupModalNF" class="modal-info-value">-</span></div>
-                <div class="modal-info-item"><span class="modal-info-label">Lançada por</span><span id="dupModalColaborador" class="modal-info-value" style="color:#f0c040;">-</span></div>
+                <div class="modal-info-item"><span class="modal-info-label">1º Colaborador</span><span id="dupModalColaborador" class="modal-info-value" style="color:#f0c040;">-</span></div>
             </div>
-            <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Foi feita por dois colaboradores?</p>
+            <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Confirme ou edite o nome do 2º colaborador:</p>
             <div class="form-group" style="margin-bottom:18px;">
-                <label for="dupInputColaborador">👤 Nome do 2º Colaborador</label>
+                <label for="dupInputColaborador">👤 2º Colaborador</label>
                 <input type="text" id="dupInputColaborador" placeholder="Nome do segundo colaborador" autocomplete="off">
             </div>
             <div class="modal-actions">
                 <button id="btnDupCancelar" class="btn-danger">✕ Cancelar</button>
-                <button id="btnDupConfirmar" class="btn-success">✓ Adicionar 2º Colaborador</button>
+                <button id="btnDupConfirmar" class="btn-success">✓ Confirmar</button>
             </div>
         </div>
     </div>
@@ -1431,12 +1431,22 @@
             // Abre modal de duplicata
             document.getElementById('dupModalNF').textContent = numeroNF;
             document.getElementById('dupModalColaborador').textContent = colaboradorExistente || nomeColaborador;
-            document.getElementById('dupInputColaborador').value = '';
+            // Preenche automaticamente o nome do 2º colaborador (quem está logado agora)
+            document.getElementById('dupInputColaborador').value = nomeColaborador;
             document.getElementById('modalDuplicada').classList.add('show');
             document.body.classList.add('modal-open');
 
-            // Guarda contexto para o callback do modal
-            pendenteDuplicata = { codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja };
+            // Guarda o colaborador ORIGINAL (da planilha) e o atual separadamente
+            pendenteDuplicata = {
+                codigoBarras,
+                temFoto,
+                numeroNF,
+                nomeLoja,
+                colaboradorOriginal: colaboradorExistente || nomeColaborador, // quem já estava
+                nomeColaborador: nomeColaborador // quem está beepando agora
+            };
+            // Foca no botão confirmar (campo já preenchido automaticamente)
+            setTimeout(() => document.getElementById('btnDupConfirmar').focus(), 100);
             return;
         }
 
@@ -1449,19 +1459,20 @@
         const segundo = document.getElementById('dupInputColaborador').value.trim();
         if (!segundo) { mostrarFeedback('❌ Digite o nome do 2º colaborador', 'error'); return; }
 
-        // Salva os dados ANTES de fechar o modal (fecharModalDuplicata zeraria pendenteDuplicata)
         if (!pendenteDuplicata) return;
         const dados = { ...pendenteDuplicata };
-        const colaboradorCombinado = dados.nomeColaborador + ' + ' + segundo;
+
+        // Combina: PRIMEIRO (quem já estava na planilha) + SEGUNDO (quem está beepando agora)
+        const colaboradorCombinado = dados.colaboradorOriginal + ' + ' + segundo;
 
         fecharModalDuplicata();
 
         await salvarEntrada({
-            codigoBarras: dados.codigoBarras,
-            temFoto:      dados.temFoto,
-            numeroNF:     dados.numeroNF,
+            codigoBarras:    dados.codigoBarras,
+            temFoto:         dados.temFoto,
+            numeroNF:        dados.numeroNF,
             nomeColaborador: colaboradorCombinado,
-            nomeLoja:     dados.nomeLoja
+            nomeLoja:        dados.nomeLoja
         });
     }
 
