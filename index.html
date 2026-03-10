@@ -1092,7 +1092,7 @@ function atualizarLista() {
     </div>`).join('');
 }
 
-unction mostrarFeedback(msg, tipo) {
+function mostrarFeedback(msg, tipo) {
   const cores = {
     success: { bg: '#059669', txt: 'white' },
     error:   { bg: '#dc2626', txt: 'white' },
@@ -1222,11 +1222,21 @@ async function fazerLoginScanner() {
       const usuario = { nome: res.nome, email: res.email, role: res.role };
       sessionStorage.setItem(SCANNER_SESSION_KEY, JSON.stringify(usuario));
       mostrarScanner(usuario);
+      return; // sai antes do finally reabilitar o botão (já mudou de tela)
     } else {
       mostrarErroScanner(res?.erro || 'Email ou senha incorretos.');
     }
-  } catch(e) { mostrarErroScanner('Sem conexão. Verifique a internet.'); }
-  btn.disabled = false; btn.textContent = 'Entrar';
+  } catch(e) {
+    mostrarErroScanner(
+      e?.message === 'Timeout'
+        ? 'Servidor demorou demais. Tente novamente.'
+        : 'Sem conexão. Verifique a internet.'
+    );
+  } finally {
+    // Garante que o botão SEMPRE volta a ficar ativo, mesmo se ocorrer
+    // qualquer erro inesperado dentro do try ou do catch.
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
 }
 
 function mostrarErroScanner(msg) {
@@ -1281,4 +1291,3 @@ function logoutScanner() {
 </script>
 </body>
 </html>
-
