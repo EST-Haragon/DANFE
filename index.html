@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QGK – Scanner DANFE</title>
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>QGK – Leitor de Chave NF-e</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #f4f5f7;
@@ -21,218 +21,81 @@
   --green-bg: #ecfdf5;
   --yellow: #d97706;
   --yellow-bg:#fffbeb;
-  --red: #dc2626;
-  --red-bg: #fef2f2;
-  --blue: #2563eb;
-  --blue-bg: #eff6ff;
   --radius: 12px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md:0 4px 16px rgba(0,0,0,0.08);
-  --neon: #7fff00;
-  --olive: #4a5c2f;
-  --smoke: #8faa72;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { overflow-y: scroll; overflow-x: hidden; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
-body.modal-open { overflow: hidden; }
-
 .container { max-width: 440px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; box-shadow: var(--shadow-md); }
 
-/* ── LOGO ── */
 .logo-header { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
-.logo-hex { width: 48px; height: 48px; flex-shrink: 0; }
+.logo-hex { width: 44px; height: 44px; flex-shrink: 0; }
 .logo-text-block { display: flex; flex-direction: column; align-items: flex-start; line-height: 1; }
-.logo-qgk { font-family: 'Black Ops One', cursive; font-size: 26px; letter-spacing: 5px; color: #111827; }
-.logo-sub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; color: var(--text3); text-transform: uppercase; margin-top: 3px; }
+.logo-qgk { font-family: 'Black Ops One', cursive; font-size: 24px; letter-spacing: 4px; color: #111827; }
+.logo-sub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--text3); text-transform: uppercase; margin-top: 3px; }
 
-/* ── FORM ── */
-.form-group { margin-bottom: 14px; }
-.form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text2); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; font-family: 'DM Mono', monospace; }
-.form-group input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border2); border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500; background: var(--surface2); color: var(--text); transition: all 0.2s; }
-.form-group input::placeholder { color: var(--text3); }
-.form-group input:focus { outline: none; border-color: var(--accent); background: white; box-shadow: 0 0 0 3px rgba(17,24,39,0.08); }
-
-/* ── BUTTONS ── */
 button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; border-radius: 8px; font-weight: 600; letter-spacing: 0.3px; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-primary { width: 100%; padding: 12px; background: var(--accent); color: white; font-size: 14px; margin-bottom: 8px; }
-.btn-primary:hover:not(:disabled) { background: var(--accent2); transform: translateY(-1px); box-shadow: var(--shadow-md); }
-.btn-primary:disabled { background: var(--border); color: var(--text3); cursor: not-allowed; }
-.btn-secondary { width: 100%; padding: 11px; background: var(--surface2); color: var(--text2); font-size: 13px; margin-bottom: 8px; border: 1.5px solid var(--border2); }
-.btn-secondary:hover:not(:disabled) { background: var(--border); color: var(--text); }
-.btn-secondary:disabled { opacity: 0.4; cursor: not-allowed; }
-.btn-danger { width: 100%; padding: 11px; background: var(--red-bg); color: var(--red); font-size: 13px; border: 1.5px solid #fecaca; }
-.btn-danger:hover:not(:disabled) { background: #fee2e2; }
-.btn-danger:disabled { opacity: 0.3; cursor: not-allowed; }
-.btn-success { width: 100%; padding: 11px; background: var(--green-bg); color: var(--green); font-size: 13px; margin-bottom: 8px; border: 1.5px solid #a7f3d0; }
-.btn-success:hover:not(:disabled) { background: #d1fae5; }
-.btn-success:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-primary { width: 100%; padding: 13px; background: var(--accent); color: white; font-size: 14px; margin-bottom: 8px; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { width: 100%; padding: 12px; background: var(--surface2); color: var(--text2); font-size: 13px; margin-bottom: 8px; border: 1.5px solid var(--border2); }
+.btn-secondary:hover { background: var(--border); color: var(--text); }
 .btn-close-camera { width: 100%; padding: 9px; margin-top: 8px; background: var(--surface2); color: var(--text2); font-size: 12px; border: 1.5px solid var(--border2); border-radius: 8px; }
-.btn-close-camera:hover { background: var(--red-bg); color: var(--red); border-color: #fecaca; }
-.action-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); }
-.button-group { display: flex; gap: 8px; width: 100%; }
-.button-group button { flex: 1; margin: 0; font-size: 12px; }
+.btn-close-camera:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
 
-/* ── CAMERA ── */
-.camera-container { margin-bottom: 14px; position: relative; }
+.camera-container { margin-bottom: 14px; position: relative; display: none; }
 #video { width: 100%; border-radius: 8px; border: 2px solid var(--border2); display: block; background: #000; }
 .camera-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 90%; height: 40%; border: 2px solid var(--accent); border-radius: 4px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; }
-.camera-overlay::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); animation: scan 2s linear infinite; }
-@keyframes scan { 0%,100%{top:0} 50%{top:100%} }
 .camera-hint { position: absolute; bottom: 44px; left: 0; right: 0; text-align: center; color: white; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 1px; padding: 5px; background: rgba(0,0,0,0.55); }
 
-/* ── NOTAS ── */
-.notas-section { margin-top: 24px; }
-.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.section-header h2 { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; }
-.contador { background: var(--accent); color: white; padding: 3px 12px; font-size: 12px; font-weight: 700; border-radius: 20px; font-family: 'DM Mono', monospace; }
-.lista-notas { max-height: 380px; overflow-y: auto; padding-right: 2px; }
-.lista-notas::-webkit-scrollbar { width: 4px; }
-.lista-notas::-webkit-scrollbar-track { background: var(--bg); }
-.lista-notas::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.nota-card { background: var(--surface2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; transition: all 0.2s; }
-.nota-card:hover { border-left-color: var(--blue); background: var(--blue-bg); transform: translateX(2px); }
-.nota-colaborador { font-weight: 600; color: var(--text); font-size: 14px; margin-bottom: 2px; }
-.nota-loja { color: var(--blue); font-weight: 600; font-size: 12px; }
-.nota-numero { color: var(--text2); font-size: 12px; font-family: 'DM Mono', monospace; margin-bottom: 2px; }
-.nota-data { color: var(--text3); font-size: 11px; font-family: 'DM Mono', monospace; display: flex; align-items: center; gap: 6px; }
-.empty-state { text-align: center; color: var(--text3); padding: 40px 20px; font-size: 13px; font-family: 'DM Mono', monospace; }
-
-/* ── FEEDBACK ── */
-.feedback { display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 14px; color: white; font-weight: 600; text-align: center; font-size: 13px; animation: slideDown 0.3s ease; }
-@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── MODAL ── */
-.modal-confirmacao { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
-.modal-confirmacao.show { display: flex; }
-.modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; max-width: 400px; width: 100%; box-shadow: var(--shadow-md); animation: modalUp 0.25s ease; }
-@keyframes modalUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.modal-header { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; margin-bottom: 18px; text-align: center; }
-.modal-info { background: var(--surface2); border: 1px solid var(--border); padding: 14px; border-radius: 8px; margin-bottom: 14px; }
-.modal-info-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
-.modal-info-item:last-child { margin-bottom: 0; }
-.modal-info-label { color: var(--text3); font-weight: 600; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
-.modal-info-value { color: var(--text); font-weight: 600; font-size: 13px; }
-.modal-barcode { background: var(--surface2); border: 1px dashed var(--border2); padding: 10px; border-radius: 8px; text-align: center; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); word-break: break-all; margin-bottom: 16px; }
-.modal-actions { display: flex; gap: 10px; }
-.modal-actions button { flex: 1; padding: 12px; font-size: 13px; }
-
-/* ── BARCODE READER ── */
 .barcode-input-container { display: none; margin-bottom: 14px; }
 .barcode-input-container.show { display: block; }
-.barcode-display { width: 100%; padding: 12px 14px; border: 2px solid var(--accent); border-radius: 8px; font-size: 15px; font-weight: 700; text-align: center; background: var(--surface2); color: var(--accent); font-family: 'DM Mono', monospace; margin-bottom: 10px; letter-spacing: 2px; }
+.barcode-display { width: 100%; padding: 12px 14px; border: 2px solid var(--accent); border-radius: 8px; font-size: 15px; font-weight: 700; text-align: center; background: var(--surface2); color: var(--accent); font-family: 'DM Mono', monospace; margin-bottom: 10px; letter-spacing: 1px; }
 .barcode-hint { text-align: center; color: var(--text2); font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 1px; padding: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 .hidden-barcode-input { position: absolute; left: -9999px; width: 1px; height: 1px; }
 
-/* ── BARCODE DIGITS ── */
-.modal-barcode .digitos-ok { color: var(--green); font-size: 12px; }
-.modal-barcode .digitos-alerta { color: var(--yellow); font-size: 12px; }
-.modal-barcode .len-badge { display: inline-block; margin-top: 6px; font-size: 10px; padding: 2px 8px; background: var(--surface2); border-radius: 4px; color: var(--text3); }
-
-/* ── ENGINE BADGE ── */
-.engine-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 5px 12px; border-radius: 20px; margin-bottom: 10px; width: 100%; text-align: center; font-weight: 500; }
+.engine-badge { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; padding: 5px 12px; border-radius: 20px; margin-bottom: 14px; width: 100%; text-align: center; font-weight: 500; }
 .engine-badge.native { background: var(--green-bg); color: var(--green); border: 1px solid #a7f3d0; }
 .engine-badge.fallback { background: var(--yellow-bg); color: var(--yellow); border: 1px solid #fde68a; }
 
-/* ── CHECKBOX FOTO ── */
-.foto-checkbox-label { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 14px; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 8px; cursor: pointer; user-select: none; transition: all 0.15s; }
-.foto-checkbox-label:hover { background: var(--blue-bg); border-color: #93c5fd; }
-.foto-checkbox-label input[type="checkbox"] { display: none; }
-.foto-checkbox-box { width: 20px; height: 20px; border: 2px solid var(--border2); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
-.foto-checkbox-label input:checked + .foto-checkbox-box { background: var(--accent); border-color: var(--accent); }
-.foto-checkbox-label input:checked + .foto-checkbox-box::after { content: '✓'; color: white; font-size: 13px; font-weight: 700; line-height: 1; }
-.foto-checkbox-text { font-size: 13px; color: var(--text2); font-weight: 500; }
-.foto-checkbox-label:has(input:checked) .foto-checkbox-text { color: var(--text); }
+.resultado-section { margin-top: 8px; }
+.chave-card { background: var(--surface2); border: 1.5px solid var(--border2); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px; margin-bottom: 10px; animation: slideDown 0.25s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.chave-card.copiado { border-left-color: var(--green); background: var(--green-bg); }
+.chave-numero { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 700; color: var(--text); word-break: break-all; line-height: 1.4; margin-bottom: 6px; letter-spacing: 0.5px; }
+.chave-meta { display: flex; justify-content: space-between; align-items: center; }
+.chave-len { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.btn-copiar { padding: 6px 14px; font-size: 12px; background: var(--accent); color: white; }
+.btn-copiar:hover { background: var(--accent2); }
+.btn-copiar.ok { background: var(--green); }
 
-/* ── NOTA CARD ── */
-.nota-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
-.camera-badge { font-size: 16px; }
-.nota-loja-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.btn-edit-loja { background: none; border: none; font-size: 13px; cursor: pointer; padding: 2px 6px; border-radius: 4px; opacity: 0.4; transition: all 0.15s; font-family: inherit; }
-.nota-card:hover .btn-edit-loja { opacity: 1; }
-.btn-edit-loja:hover { background: var(--surface); opacity: 1; }
-.enter-hint { text-align: center; color: var(--text3); font-size: 11px; margin-top: 10px; font-family: 'DM Mono', monospace; }
-
-/* ── LOJA SELECTOR ── */
-.loja-selector { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
-.loja-selector::-webkit-scrollbar { width: 4px; }
-.loja-selector::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
-.loja-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid var(--border2); border-radius: 8px; cursor: pointer; transition: all 0.15s; user-select: none; background: var(--surface2); }
-.loja-option:hover { background: var(--blue-bg); border-color: #93c5fd; }
-.loja-option.selected { background: var(--accent); border-color: var(--accent); color: white; }
-.loja-option input[type="radio"] { display: none; }
-.loja-radio-box { width: 18px; height: 18px; border: 2px solid var(--border2); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; background: white; }
-.loja-option.selected .loja-radio-box { border-color: white; background: transparent; }
-.loja-option.selected .loja-radio-box::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; }
-.loja-option-name { font-size: 14px; font-weight: 600; }
-.loja-selector-loading { color: var(--text3); font-size: 12px; font-family: 'DM Mono', monospace; padding: 12px; text-align: center; }
-.loja-selector-empty { color: var(--text3); font-size: 12px; font-family: 'DM Mono', monospace; padding: 12px; text-align: center; line-height: 1.8; }
+.empty-state { text-align: center; color: var(--text3); padding: 30px 20px; font-size: 13px; font-family: 'DM Mono', monospace; }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.section-header h2 { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.5px; text-transform: uppercase; }
+.btn-limpar-lista { background: none; border: none; color: var(--text3); font-size: 11px; font-family: 'DM Mono', monospace; text-decoration: underline; cursor: pointer; padding: 4px; }
+.lista-chaves { max-height: 340px; overflow-y: auto; padding-right: 2px; }
+.lista-chaves::-webkit-scrollbar { width: 4px; }
+.lista-chaves::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
 @media (max-width: 480px) { body { padding: 12px; } .container { padding: 20px 16px; } }
 </style>
 </head>
 <body>
 
-<!-- TELA DE LOGIN -->
-<div id="loginScreen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9000;padding:20px;">
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:100%;max-width:380px;box-shadow:var(--shadow-md);">
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:28px;">
-      <svg style="width:40px;height:40px;flex-shrink:0;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="#2e3d1a" stroke="#4a5c2f" stroke-width="2"/>
-        <polygon points="50,16 80,33 80,67 50,84 20,67 20,33" fill="none" stroke="#4a5c2f" stroke-width="1" opacity="0.5"/>
-        <text x="50" y="62" text-anchor="middle" font-family="Black Ops One, cursive" font-size="28" fill="#7fff00" letter-spacing="1">QGK</text>
-      </svg>
-      <div>
-        <div style="font-family:'Black Ops One',cursive;font-size:22px;color:var(--text);letter-spacing:4px;">QGK</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;">Scanner DANFE</div>
-      </div>
-    </div>
-    <div id="loginError" style="display:none;background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;font-weight:500;"></div>
-    <div style="margin-bottom:12px;">
-      <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-family:'DM Mono',monospace;">Email</label>
-      <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email" style="width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);outline:none;">
-    </div>
-    <div style="margin-bottom:20px;">
-      <label style="display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-family:'DM Mono',monospace;">Senha</label>
-      <input type="password" id="loginSenha" placeholder="••••••••" autocomplete="current-password" style="width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--surface2);color:var(--text);outline:none;">
-    </div>
-    <button id="loginBtn" onclick="fazerLoginScanner()" style="width:100%;padding:13px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all 0.18s;">
-      Entrar
-    </button>
-  </div>
-</div>
-
-<div class="container" id="appContainer" style="display:none;">
+<div class="container">
   <div class="logo-header">
     <svg class="logo-hex" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" fill="#2e3d1a" stroke="#4a5c2f" stroke-width="2"/>
       <polygon points="50,16 80,33 80,67 50,84 20,67 20,33" fill="none" stroke="#4a5c2f" stroke-width="1" opacity="0.5"/>
-      <text x="50" y="62" text-anchor="middle" font-family="Black Ops One, cursive" font-size="28" fill="#7fff00" letter-spacing="1">QGK</text>
+      <text x="50" y="62" text-anchor="middle" font-family="Black Ops One, cursive" font-size="26" fill="#7fff00" letter-spacing="1">QGK</text>
     </svg>
     <div class="logo-text-block">
       <span class="logo-qgk">QGK</span>
-      <span class="logo-sub">Scanner DANFE</span>
+      <span class="logo-sub">Leitor de Chave NF-e</span>
     </div>
-    <button onclick="logoutScanner()" title="Sair" style="margin-left:auto;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;">
-      🚪 Sair
-    </button>
   </div>
 
-  <div id="feedback" class="feedback"></div>
-
-  <div class="form-group">
-    <label for="inputNomeColaborador">👤 Colaborador</label>
-    <input type="text" id="inputNomeColaborador" placeholder="Nome do colaborador" autocomplete="off">
-  </div>
-
-  <div class="form-group">
-    <label>🏪 Loja</label>
-    <div id="lojaSelector" class="loja-selector">
-      <div class="loja-selector-loading">⟳ Carregando lojas...</div>
-    </div>
-    <input type="hidden" id="inputNomeLoja">
-  </div>
+  <div id="engineBadge" class="engine-badge">⬡ VERIFICANDO SUPORTE...</div>
 
   <button id="btnEscanear" class="btn-primary">📷 Escanear com Câmera</button>
   <button id="btnLeitorCodigo" class="btn-secondary">🔍 Usar Leitor de Código de Barras</button>
@@ -241,183 +104,68 @@ button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; bord
     <input type="text" id="barcodeDisplay" class="barcode-display" placeholder="// AGUARDANDO CÓDIGO //" readonly>
     <div class="barcode-hint">⬡ APONTE O LEITOR PARA O CÓDIGO DE BARRAS</div>
     <input type="text" id="barcodeInput" class="hidden-barcode-input" autocomplete="off">
-    <button id="btnFecharLeitor" class="btn-close-camera" style="margin-top: 10px;">✕ FECHAR LEITOR</button>
+    <button id="btnFecharLeitor" class="btn-close-camera">✕ FECHAR LEITOR</button>
   </div>
 
-  <div id="engineBadge" class="engine-badge">⬡ VERIFICANDO SUPORTE...</div>
-
-  <div id="cameraContainer" class="camera-container" style="display: none;">
+  <div id="cameraContainer" class="camera-container">
     <video id="video" playsinline></video>
     <div class="camera-overlay"></div>
     <div class="camera-hint" id="cameraHint">⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA</div>
     <button id="btnFecharCamera" class="btn-close-camera">✕ FECHAR CÂMERA</button>
   </div>
 
-  <div class="notas-section">
+  <div class="resultado-section">
     <div class="section-header">
-      <h2>📋 Notas Escaneadas</h2>
-      <span id="contador" class="contador">0</span>
+      <h2>Chaves lidas nesta sessão</h2>
+      <button id="btnLimparLista" class="btn-limpar-lista">limpar lista</button>
     </div>
-    <div id="listaNotas" class="lista-notas">
-      <p class="empty-state">// nenhuma nota escaneada ainda</p>
-    </div>
-    <div id="actionButtons" class="action-buttons" style="display: none;">
-      <button id="btnExportarJSON" class="btn-success">📊 Exportar para Dashboard (JSON)</button>
-      <div class="button-group">
-        <button id="btnExportarPDF" class="btn-primary">📄 Exportar PDF</button>
-        <!-- FIX: btn-limpar agora habilitado quando há notas, sem depender do PDF -->
-        <button id="btnLimpar" class="btn-danger">🗑 Limpar Tudo</button>
-      </div>
+    <div id="listaChaves" class="lista-chaves">
+      <p class="empty-state">// nenhuma chave lida ainda</p>
     </div>
   </div>
 </div>
 
-<!-- Modal de Confirmação -->
-<div id="modalConfirmacao" class="modal-confirmacao">
-  <div class="modal-content">
-    <div class="modal-header">⬡ CONFIRMAR LEITURA</div>
-    <div class="modal-info">
-      <div class="modal-info-item"><span class="modal-info-label">Colaborador</span><span id="modalColaborador" class="modal-info-value">-</span></div>
-      <div class="modal-info-item"><span class="modal-info-label">Loja</span><span id="modalLoja" class="modal-info-value">-</span></div>
-      <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="modalNumeroNF" class="modal-info-value">-</span></div>
-    </div>
-    <div id="modalBarcode" class="modal-barcode"></div>
-    <label class="foto-checkbox-label">
-      <input type="checkbox" id="checkFoto">
-      <span class="foto-checkbox-box"></span>
-      <span class="foto-checkbox-text">📷 Nota acompanha foto</span>
-    </label>
-    <div class="modal-actions">
-      <button id="btnCancelar" class="btn-danger">✕ Cancelar</button>
-      <button id="btnConfirmar" class="btn-success">✓ Confirmar</button>
-    </div>
-    <div class="enter-hint">// pressione ENTER para confirmar</div>
-  </div>
-</div>
-
-<!-- Modal NF Duplicada -->
-<div id="modalDuplicada" class="modal-confirmacao">
-  <div class="modal-content">
-    <div class="modal-header" style="color:#f0c040;">⚠️ NOTA JÁ LANÇADA</div>
-    <div class="modal-info" style="margin-bottom:16px;">
-      <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="dupModalNF" class="modal-info-value">-</span></div>
-      <div class="modal-info-item"><span class="modal-info-label">1º Colaborador</span><span id="dupModalColaborador" class="modal-info-value" style="color:#f0c040;">-</span></div>
-    </div>
-    <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;line-height:1.6;">Esta NF já está na planilha. Confirme ou edite o nome do 2º colaborador:</p>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label for="dupInputColaborador">👤 2º Colaborador</label>
-      <input type="text" id="dupInputColaborador" placeholder="Nome do segundo colaborador" autocomplete="off">
-    </div>
-    <div class="modal-actions">
-      <button id="btnDupCancelar" class="btn-danger">✕ Cancelar</button>
-      <button id="btnDupConfirmar" class="btn-success">✓ Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Senha Edição Loja -->
-<div id="modalSenhaLoja" class="modal-confirmacao">
-  <div class="modal-content">
-    <div class="modal-header">🔒 SENHA DE EDIÇÃO</div>
-    <p style="font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);margin-bottom:16px;text-align:center;">Digite a senha para editar o nome da loja</p>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label for="inputSenhaLoja">🔑 Senha</label>
-      <input type="password" id="inputSenhaLoja" placeholder="Digite a senha..." autocomplete="off">
-    </div>
-    <div class="modal-actions">
-      <button id="btnSenhaCancelar" class="btn-danger">✕ Cancelar</button>
-      <button id="btnSenhaConfirmar" class="btn-success">✓ Confirmar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Editar Loja -->
-<div id="modalEditarLoja" class="modal-confirmacao">
-  <div class="modal-content">
-    <div class="modal-header">✏️ EDITAR LOJA</div>
-    <div class="modal-info" style="margin-bottom:16px;">
-      <div class="modal-info-item"><span class="modal-info-label">NF</span><span id="editModalNF" class="modal-info-value">-</span></div>
-      <div class="modal-info-item"><span class="modal-info-label">Colaborador</span><span id="editModalColaborador" class="modal-info-value">-</span></div>
-    </div>
-    <div class="form-group" style="margin-bottom:18px;">
-      <label for="editInputLoja">🏪 Nova Loja</label>
-      <input type="text" id="editInputLoja" placeholder="Nome da loja" autocomplete="off">
-    </div>
-    <div class="modal-actions">
-      <button id="btnEditCancelar" class="btn-danger">✕ Cancelar</button>
-      <button id="btnEditSalvar" class="btn-success">✓ Salvar</button>
-    </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 <script>
-const { jsPDF } = window.jspdf;
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz40__TuQkxlnywycf_uVjSl7Iq7MS05AHv69X05jLPTsiocJwyz_wPe234G0h_1xcU/exec';
-
 // ─── DOM ───
-const inputNomeColaborador = document.getElementById('inputNomeColaborador');
-const inputNomeLoja        = document.getElementById('inputNomeLoja');
-const btnEscanear          = document.getElementById('btnEscanear');
-const btnLeitorCodigo      = document.getElementById('btnLeitorCodigo');
-const cameraContainer      = document.getElementById('cameraContainer');
-const video                = document.getElementById('video');
-const listaNotas           = document.getElementById('listaNotas');
-const contador             = document.getElementById('contador');
-const feedback             = document.getElementById('feedback');
-const btnExportarJSON      = document.getElementById('btnExportarJSON');
-const btnExportarPDF       = document.getElementById('btnExportarPDF');
-const btnLimpar            = document.getElementById('btnLimpar');
-const actionButtons        = document.getElementById('actionButtons');
-const modalConfirmacao     = document.getElementById('modalConfirmacao');
-const modalColaborador     = document.getElementById('modalColaborador');
-const modalLoja            = document.getElementById('modalLoja');
-const modalNumeroNF        = document.getElementById('modalNumeroNF');
-const modalBarcode         = document.getElementById('modalBarcode');
-const btnCancelar          = document.getElementById('btnCancelar');
-const btnConfirmar         = document.getElementById('btnConfirmar');
-const barcodeInputContainer= document.getElementById('barcodeInputContainer');
-const barcodeInput         = document.getElementById('barcodeInput');
-const barcodeDisplay       = document.getElementById('barcodeDisplay');
-const cameraHint           = document.getElementById('cameraHint');
-const engineBadge          = document.getElementById('engineBadge');
+const btnEscanear      = document.getElementById('btnEscanear');
+const btnLeitorCodigo  = document.getElementById('btnLeitorCodigo');
+const cameraContainer  = document.getElementById('cameraContainer');
+const video            = document.getElementById('video');
+const cameraHint       = document.getElementById('cameraHint');
+const engineBadge      = document.getElementById('engineBadge');
+const barcodeInputContainer = document.getElementById('barcodeInputContainer');
+const barcodeInput     = document.getElementById('barcodeInput');
+const barcodeDisplay   = document.getElementById('barcodeDisplay');
+const listaChaves      = document.getElementById('listaChaves');
 
-// ─── ESTADO ───
-let notasFiscais = [];
+// ─── ESTADO (só em memória, nada é salvo) ───
+let chavesLidas = [];       // [{codigo, hora}]
 let scannerAtivo = false;
 let stream = null;
 let modoLeitor = false;
-let codigoAtualConfirmacao = null;
 let rafId = null;
 let zxingReader = null;
 let loopPausado = false;
 let cooldownCodigo = '';
 let cooldownTimer = null;
 
-// ─── LEITOR FÍSICO ───
 const MIN_LEN = 20;
 const PAUSA_LEITOR = 200;
 let bufferLeitor = '';
 let timerLeitor = null;
 let ultimoKeyTime = 0;
 
-// ─── EVENTOS ───
 btnEscanear.addEventListener('click', iniciarScanner);
 btnLeitorCodigo.addEventListener('click', iniciarLeitorCodigo);
 document.getElementById('btnFecharCamera').addEventListener('click', pararScanner);
 document.getElementById('btnFecharLeitor').addEventListener('click', pararLeitorCodigo);
-btnExportarJSON.addEventListener('click', exportarJSON);
-btnExportarPDF.addEventListener('click', exportarPDF);
-btnLimpar.addEventListener('click', limparNotas);
-btnCancelar.addEventListener('click', fecharModal);
-btnConfirmar.addEventListener('click', confirmarLeitura);
+document.getElementById('btnLimparLista').addEventListener('click', () => {
+  chavesLidas = []; renderLista();
+});
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && modalConfirmacao.classList.contains('show')) {
-    e.preventDefault(); confirmarLeitura(); return;
-  }
-  if (modoLeitor && !modalConfirmacao.classList.contains('show')) capturarTeclaLeitor(e);
+  if (modoLeitor) capturarTeclaLeitor(e);
 });
 
 // ═══════════════════════
@@ -440,16 +188,12 @@ function iniciarEngineBadge() {
     setEngineBadge('⬡ ZXING JS (FALLBACK)', false);
   }
 }
+iniciarEngineBadge();
 
 // ═══════════════════════
 // CÂMERA
 // ═══════════════════════
 async function iniciarScanner() {
-  const nomeColaborador = inputNomeColaborador.value.trim();
-  const nomeLoja = inputNomeLoja.value.trim();
-  if (!nomeColaborador || !nomeLoja) {
-    mostrarFeedback('❌ Preencha colaborador e loja primeiro', 'error'); return;
-  }
   scannerAtivo = true;
   loopPausado = false;
   cameraContainer.style.display = 'block';
@@ -467,7 +211,7 @@ async function iniciarScanner() {
     else await iniciarZXing();
   } catch(err) {
     console.error('[CAMERA]', err);
-    mostrarFeedback('❌ Erro ao acessar câmera', 'error');
+    alert('Erro ao acessar a câmera. Verifique as permissões.');
     pararScanner();
   }
 }
@@ -485,20 +229,13 @@ function pararScanner() {
   btnLeitorCodigo.style.display = 'flex';
 }
 
-function pausarLoop() {
-  loopPausado = true;
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-  cameraHint.textContent = '⬡ AGUARDANDO CONFIRMAÇÃO...';
-}
-
-// FIX: retomarLoop corrigido — loopPausado só vira false DENTRO do timeout, após cooldown
 function retomarLoop(codigoLido) {
   loopPausado = true;
   cooldownCodigo = codigoLido;
-  cameraHint.textContent = '⬡ RECARREGANDO...';
+  cameraHint.textContent = '⬡ PRÓXIMA LEITURA EM INSTANTES...';
   clearTimeout(cooldownTimer);
   cooldownTimer = setTimeout(() => {
-    if (!scannerAtivo) return;    // câmera já foi fechada — não retoma
+    if (!scannerAtivo) return;
     cooldownCodigo = '';
     loopPausado = false;
     cameraHint.textContent = '⬡ POSICIONE O PRÓXIMO CÓDIGO';
@@ -508,7 +245,7 @@ function retomarLoop(codigoLido) {
 }
 
 // ═══════════════════════
-// ENGINE 1 – BarcodeDetector
+// ENGINE 1 – BarcodeDetector nativo
 // ═══════════════════════
 function iniciarBarcodeDetectorNativo() {
   const detector = new BarcodeDetector({ formats: ['code_128','itf','ean_13','ean_8','code_39','qr_code'] });
@@ -528,7 +265,7 @@ function iniciarBarcodeDetectorNativo() {
           if (limpo.length >= MIN_LEN) {
             if (limpo === ultimoCodigo) { contagemVotos++; } else { ultimoCodigo = limpo; contagemVotos = 1; }
             cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
-            if (contagemVotos >= MIN_VOTOS) { pausarLoop(); mostrarModalConfirmacao(limpo, true); return; }
+            if (contagemVotos >= MIN_VOTOS) { registrarChave(limpo); retomarLoop(limpo); return; }
           } else { cameraHint.textContent = '⬡ CÓDIGO DETECTADO – APROXIME MAIS'; }
         } else { cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA'; }
       } catch(e) {}
@@ -539,11 +276,11 @@ function iniciarBarcodeDetectorNativo() {
 }
 
 // ═══════════════════════
-// ENGINE 2 – ZXing
+// ENGINE 2 – ZXing (fallback)
 // ═══════════════════════
 async function iniciarZXing() {
   if (typeof ZXing === 'undefined') {
-    mostrarFeedback('❌ ZXing não carregou. Verifique a conexão.', 'error'); pararScanner(); return;
+    alert('ZXing não carregou. Verifique a conexão.'); pararScanner(); return;
   }
   const hints = new Map();
   hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
@@ -577,7 +314,7 @@ async function iniciarZXing() {
         if (limpo.length >= MIN_LEN) {
           if (limpo === ultimoCodigo) { contagemVotos++; } else { ultimoCodigo = limpo; contagemVotos = 1; }
           cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
-          if (contagemVotos >= MIN_VOTOS) { pausarLoop(); mostrarModalConfirmacao(limpo, true); return; }
+          if (contagemVotos >= MIN_VOTOS) { registrarChave(limpo); retomarLoop(limpo); return; }
         }
       } catch(e) {
         cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
@@ -589,13 +326,12 @@ async function iniciarZXing() {
 }
 
 // ═══════════════════════
-// LEITOR FÍSICO
+// LEITOR FÍSICO (USB/Bluetooth)
 // ═══════════════════════
 function capturarTeclaLeitor(e) {
   const agora = Date.now();
   if (agora - ultimoKeyTime > 500 && bufferLeitor.length > 0) bufferLeitor = '';
   ultimoKeyTime = agora;
-  // Backspace remove último char do buffer
   if (e.key === 'Backspace') {
     e.preventDefault();
     bufferLeitor = bufferLeitor.slice(0, -1);
@@ -633,8 +369,8 @@ function finalizarLeituraLeitor(codigo) {
   barcodeDisplay.value = '';
   barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
   if (limpo.length < MIN_LEN) return;
-  if (limpo.length !== 44) console.warn(`[LEITOR] ${limpo.length} dígitos:`, limpo);
-  mostrarModalConfirmacao(limpo, false);
+  registrarChave(limpo);
+  setTimeout(() => barcodeInput.focus(), 50);
 }
 
 barcodeInput.addEventListener('input', function(e) {
@@ -650,11 +386,6 @@ barcodeInput.addEventListener('input', function(e) {
 });
 
 function iniciarLeitorCodigo() {
-  const nomeColaborador = inputNomeColaborador.value.trim();
-  const nomeLoja = inputNomeLoja.value.trim();
-  if (!nomeColaborador || !nomeLoja) {
-    mostrarFeedback('❌ Preencha colaborador e loja primeiro', 'error'); return;
-  }
   modoLeitor = true; bufferLeitor = '';
   barcodeInputContainer.classList.add('show');
   btnEscanear.style.display = 'none';
@@ -672,630 +403,56 @@ function pararLeitorCodigo() {
 }
 
 // ═══════════════════════
-// MODAL + PROCESSAMENTO
+// REGISTRO + EXIBIÇÃO DA CHAVE (nada é salvo em disco/backend)
 // ═══════════════════════
-function extrairNumeroNF(c) {
-  if (!c) return null;
-  const s = c.replace(/\D/g, '');
-  if (s.length >= 44) return s.substring(25, 34).replace(/^0+/, '') || s.substring(25, 34);
-  return s;
+function registrarChave(codigo) {
+  const item = { id: Date.now(), codigo, hora: new Date() };
+  chavesLidas.unshift(item);
+  renderLista();
+  if (navigator.vibrate) navigator.vibrate(80);
 }
 
-function mostrarModalConfirmacao(codigo, temFoto = false) {
-  // Guarda contra duplo-scan: ignora se já há um modal aberto
-  if (modalConfirmacao.classList.contains('show')) return;
-  const numeroNF = extrairNumeroNF(codigo);
-  codigoAtualConfirmacao = codigo;
-  modalColaborador.textContent = inputNomeColaborador.value.trim();
-  modalLoja.textContent = inputNomeLoja.value.trim();
-  modalNumeroNF.textContent = numeroNF || 'Não identificado';
-  const cls = codigo.length === 44 ? 'digitos-ok' : 'digitos-alerta';
-  modalBarcode.innerHTML = `<span class="${cls}">${codigo}</span><br><span class="len-badge">${codigo.length} dígitos ${codigo.length === 44 ? '✓' : '⚠ esperado 44'}</span>`;
-  document.getElementById('checkFoto').checked = false;
-  modalConfirmacao.classList.add('show');
-  document.body.classList.add('modal-open');
-  btnConfirmar.focus();
+function formatarHora(d) {
+  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function fecharModal() {
-  const codigoLido = codigoAtualConfirmacao;
-  modalConfirmacao.classList.remove('show');
-  document.body.classList.remove('modal-open');
-  codigoAtualConfirmacao = null;
-  if (modoLeitor) {
-    bufferLeitor = ''; clearTimeout(timerLeitor);
-    barcodeDisplay.value = ''; barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
-    barcodeInput.value = '';
-    setTimeout(() => barcodeInput.focus(), 100);
-  } else if (scannerAtivo) {
-    retomarLoop(codigoLido || '');
-  }
-}
-
-function confirmarLeitura() {
-  if (!codigoAtualConfirmacao) return;
-  const comFoto = document.getElementById('checkFoto').checked;
-  const codigoParaProcessar = codigoAtualConfirmacao;
-  fecharModal(); // fecha primeiro — salva codigoLido internamente antes de zerar
-  processarCodigo(codigoParaProcessar, comFoto); // processa depois, câmera já em cooldown
-}
-
-// ═══════════════════════════════════════════════════════════
-// FILA DE SALVAMENTO
-// Garante que os salvamentos no backend ocorram UM DE CADA VEZ,
-// em ordem, sem concorrência — resolve o problema de NFs perdidas
-// quando o colaborador bepa várias notas em sequência rápida.
-// ═══════════════════════════════════════════════════════════
-let _filaBackend = [];
-let _filaProcessando = false;
-
-function enfileirarSalvamento(nota) {
-  _filaBackend.push(nota);
-  _processarFila();
-}
-
-async function _processarFila() {
-  if (_filaProcessando || _filaBackend.length === 0) return;
-  _filaProcessando = true;
-  while (_filaBackend.length > 0) {
-    const nota = _filaBackend[0]; // pega sem remover — só remove após confirmação
-    try {
-      const result = await jsonpRequest({ action: 'salvar', data: JSON.stringify(nota) });
-      if (result && result.ok) {
-        _filaBackend.shift(); // removida com sucesso
-        // marca como sincronizada no localStorage
-        const idx = notasFiscais.findIndex(n => String(n.id) === String(nota.id));
-        if (idx !== -1) {
-          notasFiscais[idx]._pendente = false;
-          salvarNoLocalStorage();
-          atualizarLista();
-        }
-        mostrarFeedback(`✓ NF ${nota.numeroNF} salva na planilha!`, 'success');
-      } else if (result && result.duplicada) {
-        // Backend avisou que já existe — trata como duplicata, não bloqueia a fila
-        _filaBackend.shift();
-        mostrarFeedback(`⚠️ NF ${nota.numeroNF} já estava na planilha`, 'warn');
-      } else {
-        // Falha genérica — para a fila e tenta de novo mais tarde
-        console.warn('[FILA] falha ao salvar NF', nota.numeroNF, result);
-        break;
-      }
-    } catch(e) {
-      // Sem conexão — para e tenta de novo mais tarde
-      console.warn('[FILA] sem conexão, NF pendente:', nota.numeroNF);
-      break;
-    }
-  }
-  _filaProcessando = false;
-  // Se ainda há itens pendentes, agenda nova tentativa em 8s
-  if (_filaBackend.length > 0) {
-    setTimeout(_processarFila, 8000);
-  }
-}
-
-/** Reenvio automático de notas pendentes (salvas localmente mas não na planilha) */
-function reenviarPendentes() {
-  const pendentes = notasFiscais.filter(n => n._pendente === true);
-  if (pendentes.length === 0) return;
-  pendentes.forEach(n => {
-    const jaNaFila = _filaBackend.some(f => String(f.id) === String(n.id));
-    if (!jaNaFila) _filaBackend.push(n);
-  });
-  _processarFila();
-}
-
-// ═══════════════════════════════════════════════════════════
-
-function processarCodigo(codigoBarras, temFoto = false) {
-  const numeroNF = extrairNumeroNF(codigoBarras);
-  const nomeColaborador = inputNomeColaborador.value.trim();
-  const nomeLoja = inputNomeLoja.value.trim();
-  if (!numeroNF || !nomeColaborador || !nomeLoja) {
-    mostrarFeedback('❌ Dados inválidos', 'error'); return;
-  }
-
-  // Verificação de duplicata APENAS local — elimina o await do verificar
-  // que era a causa raiz das NFs perdidas em beeps rápidos.
-  // O backend também verifica antes de inserir (segunda linha de defesa).
-  const jaExisteLocal = notasFiscais.some(n =>
-    String(n.numeroNF) === String(numeroNF) && n.loja === nomeLoja
-  );
-
-  if (jaExisteLocal) {
-    const notaExistente = notasFiscais.find(n =>
-      String(n.numeroNF) === String(numeroNF) && n.loja === nomeLoja
-    );
-    document.getElementById('dupModalNF').textContent = numeroNF;
-    document.getElementById('dupModalColaborador').textContent = notaExistente?.colaborador || nomeColaborador;
-    document.getElementById('dupInputColaborador').value = nomeColaborador;
-    document.getElementById('modalDuplicada').classList.add('show');
-    document.body.classList.add('modal-open');
-    pendenteDuplicata = {
-      codigoBarras, temFoto, numeroNF, nomeLoja,
-      colaboradorOriginal: notaExistente?.colaborador || nomeColaborador,
-      nomeColaborador
-    };
-    setTimeout(() => document.getElementById('btnDupConfirmar').focus(), 100);
+function renderLista() {
+  if (!chavesLidas.length) {
+    listaChaves.innerHTML = '<p class="empty-state">// nenhuma chave lida ainda</p>';
     return;
   }
-
-  salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja });
-}
-
-let pendenteDuplicata = null;
-
-function confirmarDuplicata() {
-  const segundo = document.getElementById('dupInputColaborador').value.trim();
-  if (!segundo) { mostrarFeedback('❌ Digite o nome do 2º colaborador', 'error'); return; }
-  if (!pendenteDuplicata) return;
-  const dados = { ...pendenteDuplicata };
-  const colaboradorCombinado = dados.colaboradorOriginal + ' + ' + segundo;
-  fecharModalDuplicata();
-  salvarEntrada({
-    codigoBarras: dados.codigoBarras, temFoto: dados.temFoto,
-    numeroNF: dados.numeroNF, nomeColaborador: colaboradorCombinado, nomeLoja: dados.nomeLoja
-  });
-}
-
-function fecharModalDuplicata() {
-  document.getElementById('modalDuplicada').classList.remove('show');
-  document.body.classList.remove('modal-open');
-  pendenteDuplicata = null;
-  if (modoLeitor) {
-    bufferLeitor = ''; barcodeDisplay.value = '';
-    barcodeDisplay.placeholder = '// AGUARDANDO CÓDIGO //';
-    barcodeInput.value = ''; barcodeInput.focus();
-  }
-}
-
-function salvarEntrada({ codigoBarras, temFoto, numeroNF, nomeColaborador, nomeLoja }) {
-  const novaEntrada = {
-    id: Date.now(), colaborador: nomeColaborador, loja: nomeLoja,
-    numeroNF, codigoCompleto: codigoBarras, temFoto,
-    dataHora: new Date().toISOString(),
-    _pendente: true // marcado como pendente até a planilha confirmar
-  };
-  notasFiscais.unshift(novaEntrada);
-  atualizarLista();
-  btnLimpar.disabled = false;
-  salvarNoLocalStorage(); // persiste imediatamente, com _pendente=true
-  enfileirarSalvamento(novaEntrada); // entra na fila — processa um de cada vez
-}
-
-document.getElementById('btnDupCancelar').addEventListener('click', fecharModalDuplicata);
-document.getElementById('btnDupConfirmar').addEventListener('click', confirmarDuplicata);
-document.getElementById('dupInputColaborador').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); confirmarDuplicata(); }
-});
-
-// ═══════════════════════
-// SELETOR DE LOJAS
-// ═══════════════════════
-let lojasDisponiveis = [];
-
-async function carregarLojas() {
-  try {
-    const res = await jsonpRequest({ action: 'listarLojas' });
-    lojasDisponiveis = Array.isArray(res) ? res : [];
-  } catch(e) {
-    const cached = localStorage.getItem('qgk_lojas_cache');
-    if (cached) { try { lojasDisponiveis = JSON.parse(cached); } catch(e2) { lojasDisponiveis = []; } }
-    else { lojasDisponiveis = []; }
-  }
-  if (lojasDisponiveis.length) localStorage.setItem('qgk_lojas_cache', JSON.stringify(lojasDisponiveis));
-  renderLojaSelector();
-}
-
-function renderLojaSelector() {
-  const selector = document.getElementById('lojaSelector');
-  const lojaAtual = document.getElementById('inputNomeLoja').value;
-  if (!lojasDisponiveis.length) {
-    selector.innerHTML = `<div class="loja-selector-empty">Nenhuma loja cadastrada.<br><span style="font-size:11px;">Acesse o Dashboard → Lojas para cadastrar.</span></div>`;
-    return;
-  }
-  // SEM onclick no label — evita duplo disparo em mobile (label + input filho)
-  selector.innerHTML = lojasDisponiveis.map(loja => `
-    <label class="loja-option${lojaAtual === loja ? ' selected' : ''}">
-      <input type="radio" name="lojaRadio" value="${loja}" ${lojaAtual === loja ? 'checked' : ''}>
-      <span class="loja-radio-box"></span>
-      <span class="loja-option-name">${loja}</span>
-    </label>`).join('');
-
-  // Event listener no input — dispara uma única vez, sem ambiguidade de elemento
-  selector.querySelectorAll('input[type="radio"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      selecionarLoja(this.value, this.closest('.loja-option'));
-    });
-  });
-}
-
-function selecionarLoja(nome, el) {
-  document.getElementById('inputNomeLoja').value = nome;
-  document.querySelectorAll('.loja-option').forEach(o => o.classList.remove('selected'));
-  if (el) el.classList.add('selected');
-}
-
-// ═══════════════════════
-// SENHA EDIÇÃO LOJA
-// ═══════════════════════
-let editandoId = null;
-const SENHA_KEY = 'qgk_senha_edicao';
-
-function abrirEditarLoja(id) {
-  const nota = notasFiscais.find(n => String(n.id) === String(id));
-  if (!nota) return;
-  editandoId = nota.id;
-  document.getElementById('inputSenhaLoja').value = '';
-  document.getElementById('modalSenhaLoja').classList.add('show');
-  document.body.classList.add('modal-open');
-  setTimeout(() => document.getElementById('inputSenhaLoja').focus(), 100);
-}
-
-function fecharSenhaLoja() {
-  document.getElementById('modalSenhaLoja').classList.remove('show');
-  document.body.classList.remove('modal-open');
-}
-
-async function confirmarSenhaLoja() {
-  const senhaDigitada = document.getElementById('inputSenhaLoja').value;
-  if (!senhaDigitada) { mostrarFeedback('❌ Digite a senha', 'error'); return; }
-  try {
-    const res = await jsonpRequest({ action: 'verificarSenhaEdicao', senha: hashSenhaScanner(senhaDigitada) });
-    if (!res || !res.ok) {
-      mostrarFeedback('❌ Senha incorreta!', 'error');
-      document.getElementById('inputSenhaLoja').value = '';
-      document.getElementById('inputSenhaLoja').focus();
-      return;
-    }
-  } catch(e) {
-    const senhaSalva = localStorage.getItem(SENHA_KEY) || '1234';
-    const senhaHash = hashSenhaScanner(senhaDigitada);
-    if (senhaHash !== senhaSalva && senhaDigitada !== senhaSalva) {
-      mostrarFeedback('❌ Senha incorreta!', 'error');
-      document.getElementById('inputSenhaLoja').value = '';
-      return;
-    }
-  }
-  fecharSenhaLoja();
-  const nota = notasFiscais.find(n => n.id === editandoId);
-  if (!nota) return;
-  document.getElementById('editModalNF').textContent = nota.numeroNF;
-  document.getElementById('editModalColaborador').textContent = nota.colaborador;
-  document.getElementById('editInputLoja').value = nota.loja;
-  document.getElementById('modalEditarLoja').classList.add('show');
-  document.body.classList.add('modal-open');
-  document.getElementById('editInputLoja').focus();
-}
-
-document.getElementById('btnSenhaCancelar').addEventListener('click', fecharSenhaLoja);
-document.getElementById('btnSenhaConfirmar').addEventListener('click', confirmarSenhaLoja);
-document.getElementById('inputSenhaLoja').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); confirmarSenhaLoja(); }
-});
-
-function fecharEditarLoja() {
-  document.getElementById('modalEditarLoja').classList.remove('show');
-  document.body.classList.remove('modal-open');
-  editandoId = null;
-}
-
-async function salvarEdicaoLoja() {
-  const novaLoja = document.getElementById('editInputLoja').value.trim();
-  if (!novaLoja) { mostrarFeedback('❌ Nome da loja não pode ser vazio', 'error'); return; }
-  const idx = notasFiscais.findIndex(n => n.id === editandoId);
-  if (idx === -1) return;
-  const nota = notasFiscais[idx];
-  notasFiscais[idx].loja = novaLoja;
-  atualizarLista();
-  salvarNoLocalStorage();
-  fecharEditarLoja();
-  mostrarFeedback('✓ Atualizando loja na planilha...', 'success');
-  try {
-    await jsonpRequest({ action: 'editarLoja', id: nota.id, novaLoja });
-    mostrarFeedback('✓ Loja atualizada na planilha!', 'success');
-  } catch(e) {
-    mostrarFeedback('⚠️ Loja atualizada localmente (sem conexão)', 'warn');
-  }
-}
-
-document.getElementById('btnEditCancelar').addEventListener('click', fecharEditarLoja);
-document.getElementById('btnEditSalvar').addEventListener('click', salvarEdicaoLoja);
-document.getElementById('editInputLoja').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') { e.preventDefault(); salvarEdicaoLoja(); }
-});
-
-// ═══════════════════════
-// JSONP + BACKEND
-// ═══════════════════════
-function jsonpRequest(params) {
-  return new Promise((resolve, reject) => {
-    const callbackName = 'jsonpCb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const timeout = setTimeout(() => {
-      delete window[callbackName];
-      document.getElementById(callbackName)?.remove();
-      reject(new Error('Timeout'));
-    }, 10000);
-    window[callbackName] = function(data) {
-      clearTimeout(timeout);
-      delete window[callbackName];
-      document.getElementById(callbackName)?.remove();
-      resolve(data);
-    };
-    const query = Object.entries({ ...params, callback: callbackName })
-      .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
-    const script = document.createElement('script');
-    script.id = callbackName;
-    script.src = APPS_SCRIPT_URL + '?' + query;
-    script.onerror = function() {
-      clearTimeout(timeout); delete window[callbackName]; script.remove(); reject(new Error('Script error'));
-    };
-    document.head.appendChild(script);
-  });
-}
-
-// ═══════════════════════
-// UI HELPERS
-// ═══════════════════════
-function formatarDataScanner(d) {
-  if (!d) return '–';
-  try {
-    const s = String(d);
-    if (s.includes('T') && (s.includes('Z') || s.includes('+'))) {
-      return new Date(s).toLocaleString('pt-BR', {
-        timeZone: 'America/Sao_Paulo',
-        day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
-      });
-    }
-    if (s.match(/^\d{2}\/\d{2}\/\d{4}/)) return s.substring(0, 16);
-    return s;
-  } catch { return String(d); }
-}
-
-function atualizarLista() {
-  // Obtém o nome do colaborador logado
-  const nomeLogado = (document.getElementById('inputNomeColaborador')?.value || '').trim().toLowerCase();
-
-  // Início e fim do dia atual
-  const agora = new Date();
-  const inicioDia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-  const fimDia    = new Date(inicioDia); fimDia.setDate(fimDia.getDate() + 1);
-
-  // notasFiscais mantém TUDO (para verificação de duplicata).
-  // notasExibidas: só do colaborador logado E só de hoje.
-  const notasExibidas = notasFiscais.filter(nota => {
-    const colaboradorNota = (nota.colaborador || '').toLowerCase();
-    if (nomeLogado && !colaboradorNota.includes(nomeLogado)) return false;
-    const d = new Date(nota.dataHora || 0);
-    return d >= inicioDia && d < fimDia;
-  });
-
-  const pendentes = notasExibidas.filter(n => n._pendente).length;
-
-  if (!notasExibidas.length) {
-    listaNotas.innerHTML = '<p class="empty-state">// nenhuma nota lançada hoje ainda</p>';
-    actionButtons.style.display = notasFiscais.length ? 'flex' : 'none';
-    contador.textContent = '0';
-    return;
-  }
-
-  actionButtons.style.display = 'flex';
-  contador.textContent = notasExibidas.length;
-
-  listaNotas.innerHTML = (pendentes > 0
-    ? `<div style="background:#92400e;color:white;font-size:11px;font-family:'DM Mono',monospace;padding:7px 12px;border-radius:6px;margin-bottom:8px;text-align:center;">⏳ ${pendentes} nota(s) aguardando sincronização com a planilha...</div>`
-    : '') +
-  notasExibidas.map(nota => `
-    <div class="nota-card${nota._pendente ? ' pendente' : ''}">
-      <div class="nota-card-top">
-        <div class="nota-colaborador">${nota.colaborador}</div>
-        ${nota.temFoto ? '<span class="camera-badge" title="Acompanha foto">📷</span>' : ''}
-        ${nota._pendente ? '<span style="font-size:10px;background:#92400e;color:white;padding:2px 7px;border-radius:10px;font-family:\'DM Mono\',monospace;">⏳</span>' : ''}
+  listaChaves.innerHTML = chavesLidas.map(item => `
+    <div class="chave-card" id="card-${item.id}">
+      <div class="chave-numero">${item.codigo}</div>
+      <div class="chave-meta">
+        <span class="chave-len">${item.codigo.length} dígitos ${item.codigo.length === 44 ? '✓' : '⚠ esperado 44'} · ${formatarHora(item.hora)}</span>
+        <button class="btn-copiar" onclick="copiarChave('${item.id}','${item.codigo}')">📋 Copiar</button>
       </div>
-      <div class="nota-loja-row">
-        <span class="nota-loja">${nota.loja}</span>
-        <button class="btn-edit-loja" onclick="abrirEditarLoja('${nota.id}')" title="Editar loja">✏️</button>
-      </div>
-      <div class="nota-numero">${nota.numeroNF}</div>
-      <div class="nota-data">${formatarDataScanner(nota.dataHora)}</div>
     </div>`).join('');
 }
 
-function mostrarFeedback(msg, tipo) {
-  const cores = {
-    success: { bg: '#059669', txt: 'white' },
-    error:   { bg: '#dc2626', txt: 'white' },
-    info:    { bg: '#2563eb', txt: 'white' },
-    warn:    { bg: '#92400e', txt: 'white' },
-  };
-  const { bg, txt } = cores[tipo] || { bg: tipo, txt: 'white' };
-  feedback.textContent = msg;
-  feedback.style.background = bg;
-  feedback.style.color = txt;
-  feedback.style.display = 'block';
-  setTimeout(() => { feedback.style.display = 'none'; }, 3500);
-}
-
-function salvarNoLocalStorage() { localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais)); }
-
-function carregarDoLocalStorage() {
-  const d = localStorage.getItem('notasFiscais');
-  if (d) { try { notasFiscais = JSON.parse(d); atualizarLista(); } catch(e) {} }
-}
-
-async function carregarDaPlanilha() {
-  try {
-    mostrarFeedback('⟳ Buscando dados da planilha...', 'info');
-    const notas = await jsonpRequest({ action: 'listar' });
-    if (Array.isArray(notas) && notas.length > 0) {
-      const idsNaPlanilha = new Set(notas.map(n => String(n.id)));
-      const apenasLocais = notasFiscais.filter(n => !idsNaPlanilha.has(String(n.id)));
-      // Merge e ordena por data desc (mais recentes no topo)
-      const merged = [...apenasLocais, ...notas];
-      merged.sort((a, b) => {
-        const da = new Date(a.dataHora || 0).getTime();
-        const db = new Date(b.dataHora || 0).getTime();
-        return db - da;
-      });
-      notasFiscais = merged;
-      atualizarLista();
-      localStorage.setItem('notasFiscais', JSON.stringify(notasFiscais));
-      mostrarFeedback(`✓ ${notas.length} notas carregadas da planilha!`, 'success');
-    } else {
-      mostrarFeedback('⬡ Planilha vazia', 'info');
-    }
-  } catch(e) {
-    mostrarFeedback('⚠️ Usando dados locais (sem conexão)', 'warn');
-  }
-}
-
-async function exportarJSON() {
-  if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', 'error'); return; }
-  try {
-    const blob = new Blob([JSON.stringify(notasFiscais, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dados_dashboard_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    mostrarFeedback('✓ JSON exportado com sucesso!', 'success');
-  } catch(e) { mostrarFeedback('❌ Erro ao exportar', 'error'); }
-}
-
-function exportarPDF() {
-  if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para exportar', 'error'); return; }
-  try {
-    const doc = new jsPDF();
-    const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
-    const porLoja = {};
-    notasFiscais.forEach(n => { if (!porLoja[n.loja]) porLoja[n.loja]=[]; porLoja[n.loja].push(n); });
-    let primeiro = true;
-    Object.keys(porLoja).sort().forEach(loja => {
-      if (!primeiro) doc.addPage(); primeiro = false;
-      const notas = porLoja[loja]; let y = 20;
-      doc.setFontSize(20); doc.setTextColor(74,92,47);
-      doc.text('Relatório de Notas Fiscais', pw/2, y, {align:'center'}); y+=15;
-      doc.setFontSize(16); doc.setTextColor(31,41,55);
-      doc.text(`Loja: ${loja}`, 20, y); y+=10;
-      doc.setFontSize(12); doc.setTextColor(75,85,99);
-      doc.text(`Total de Notas: ${notas.length}`, 20, y); y+=15;
-      doc.setDrawColor(74,92,47); doc.line(20,y,pw-20,y); y+=10;
-      doc.setFontSize(10); doc.setTextColor(107,114,128);
-      notas.forEach((nota,i) => {
-        if (y>ph-40) { doc.addPage(); y=20; }
-        doc.text(`${i+1}. NF: ${nota.numeroNF}${nota.temFoto?' [foto]':''}`, 20, y); y+=5;
-        doc.setFontSize(9); doc.setTextColor(155,160,168);
-        doc.text(`Colaborador: ${nota.colaborador}`, 25, y); y+=4;
-        doc.text(`Data: ${nota.dataHora}`, 25, y); y+=8;
-        doc.setFontSize(10); doc.setTextColor(107,114,128);
-      });
-    });
-    doc.save(`relatorio_notas_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.pdf`);
-    mostrarFeedback('✓ PDF exportado com sucesso!', 'success');
-  } catch(e) { mostrarFeedback('❌ Erro ao exportar PDF', 'error'); }
-}
-
-async function limparNotas() {
-  if (!notasFiscais.length) { mostrarFeedback('❌ Nenhuma nota para limpar', 'error'); return; }
-  if (confirm('⚠️ Tem certeza que deseja limpar todas as notas fiscais?\n\nIsso também limpará a Google Planilha.')) {
-    notasFiscais = []; atualizarLista(); salvarNoLocalStorage();
-    mostrarFeedback('✓ Todas as notas foram removidas', 'success');
-    try { await jsonpRequest({ action: 'limpar' }); } catch(e) { console.error('Erro ao limpar planilha:', e); }
-  }
-}
-
-// ═══════════════════════
-// AUTH
-// ═══════════════════════
-const SCANNER_SESSION_KEY = 'qgk_scanner_session';
-
-function hashSenhaScanner(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
-  return 'h' + Math.abs(h).toString(36);
-}
-
-async function fazerLoginScanner() {
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const senha = document.getElementById('loginSenha').value;
-  const errEl = document.getElementById('loginError');
-  const btn = document.getElementById('loginBtn');
-  if (!email || !senha) { mostrarErroScanner('Preencha email e senha.'); return; }
-  btn.disabled = true; btn.textContent = 'Verificando...'; errEl.style.display = 'none';
-  try {
-    const res = await jsonpRequest({ action: 'login', email, senha: hashSenhaScanner(senha) });
-    if (res && res.ok) {
-      const usuario = { nome: res.nome, email: res.email, role: res.role };
-      sessionStorage.setItem(SCANNER_SESSION_KEY, JSON.stringify(usuario));
-      mostrarScanner(usuario);
-      return; // sai antes do finally reabilitar o botão (já mudou de tela)
-    } else {
-      mostrarErroScanner(res?.erro || 'Email ou senha incorretos.');
-    }
-  } catch(e) {
-    mostrarErroScanner(
-      e?.message === 'Timeout'
-        ? 'Servidor demorou demais. Tente novamente.'
-        : 'Sem conexão. Verifique a internet.'
-    );
-  } finally {
-    // Garante que o botão SEMPRE volta a ficar ativo, mesmo se ocorrer
-    // qualquer erro inesperado dentro do try ou do catch.
-    btn.disabled = false; btn.textContent = 'Entrar';
-  }
-}
-
-function mostrarErroScanner(msg) {
-  const el = document.getElementById('loginError');
-  el.textContent = msg; el.style.display = 'block';
-}
-
-function mostrarScanner(usuario) {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('appContainer').style.display = 'block';
-  const inp = document.getElementById('inputNomeColaborador');
-  if (inp && usuario.nome) {
-    inp.value = usuario.nome; inp.readOnly = true;
-    inp.style.background = 'var(--surface2)'; inp.style.color = 'var(--text2)';
-    inp.title = 'Nome definido pelo login — faça logout para trocar';
-  }
-  iniciarEngineBadge();
-  carregarDoLocalStorage();
-  carregarDaPlanilha();
-  carregarLojas();
-  // Reenviar notas que ficaram pendentes da sessão anterior
-  setTimeout(reenviarPendentes, 3000);
-}
-
-function logoutScanner() {
-  if (scannerAtivo) pararScanner();
-  if (modoLeitor) pararLeitorCodigo();
-  sessionStorage.removeItem(SCANNER_SESSION_KEY);
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('appContainer').style.display = 'none';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginSenha').value = '';
-  document.getElementById('loginError').style.display = 'none';
-  const inp = document.getElementById('inputNomeColaborador');
-  if (inp) { inp.value = ''; inp.readOnly = false; inp.style.background = ''; inp.style.color = ''; inp.title = ''; }
-  notasFiscais = []; lojasDisponiveis = []; atualizarLista();
-  const sel = document.getElementById('lojaSelector');
-  if (sel) sel.innerHTML = '<div class="loja-selector-loading">⟳ Carregando lojas...</div>';
-  const hiddenLoja = document.getElementById('inputNomeLoja');
-  if (hiddenLoja) hiddenLoja.value = '';
-}
-
-// Init
-(function() {
-  ['loginEmail','loginSenha'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') fazerLoginScanner(); });
+function copiarChave(id, codigo) {
+  navigator.clipboard.writeText(codigo).then(() => {
+    const card = document.getElementById('card-' + id);
+    const btn = card.querySelector('.btn-copiar');
+    card.classList.add('copiado');
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('ok');
+    setTimeout(() => {
+      card.classList.remove('copiado');
+      btn.textContent = '📋 Copiar';
+      btn.classList.remove('ok');
+    }, 1500);
+  }).catch(() => {
+    // Fallback caso clipboard API não esteja disponível
+    const ta = document.createElement('textarea');
+    ta.value = codigo;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
   });
-  const sess = sessionStorage.getItem(SCANNER_SESSION_KEY);
-  if (sess) { try { const u = JSON.parse(sess); mostrarScanner(u); return; } catch(e) {} }
-})();
+}
 </script>
 </body>
 </html>
