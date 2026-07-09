@@ -44,8 +44,11 @@ button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; bord
 
 .camera-container { margin-bottom: 14px; position: relative; display: none; }
 #video { width: 100%; border-radius: 8px; border: 2px solid var(--border2); display: block; background: #000; }
-.camera-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 90%; height: 40%; border: 2px solid var(--accent); border-radius: 4px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; }
+.camera-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 90%; height: 36%; border: 2px solid var(--accent); border-radius: 4px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; }
 .camera-hint { position: absolute; bottom: 44px; left: 0; right: 0; text-align: center; color: white; font-size: 11px; font-family: 'DM Mono', monospace; letter-spacing: 1px; padding: 5px; background: rgba(0,0,0,0.55); }
+.camera-controls-top { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 2; }
+.btn-icone-camera { width: 38px; height: 38px; border-radius: 50%; background: rgba(0,0,0,0.55); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 16px; padding: 0; }
+.btn-icone-camera.ativo { background: var(--yellow); border-color: var(--yellow); }
 
 .barcode-input-container { display: none; margin-bottom: 14px; }
 .barcode-input-container.show { display: block; }
@@ -109,6 +112,9 @@ button { font-family: 'DM Sans', sans-serif; cursor: pointer; border: none; bord
 
   <div id="cameraContainer" class="camera-container">
     <video id="video" playsinline></video>
+    <div class="camera-controls-top">
+      <button id="btnTorch" class="btn-icone-camera" style="display:none;" title="Lanterna">💡</button>
+    </div>
     <div class="camera-overlay"></div>
     <div class="camera-hint" id="cameraHint">⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA</div>
     <button id="btnFecharCamera" class="btn-close-camera">✕ FECHAR CÂMERA</button>
@@ -138,6 +144,7 @@ const barcodeInputContainer = document.getElementById('barcodeInputContainer');
 const barcodeInput     = document.getElementById('barcodeInput');
 const barcodeDisplay   = document.getElementById('barcodeDisplay');
 const listaChaves      = document.getElementById('listaChaves');
+const btnTorch         = document.getElementById('btnTorch');
 
 // ─── ESTADO (só em memória, nada é salvo) ───
 let chavesLidas = [];       // [{codigo, hora}]
@@ -149,6 +156,44 @@ let zxingReader = null;
 let loopPausado = false;
 let cooldownCodigo = '';
 let cooldownTimer = null;
+let torchOn = false;
+
+// Canvas reutilizado pra tentar uma segunda leitura com zoom digital
+// (recorte ampliado da faixa central) quando o quadro inteiro não basta —
+// mas a leitura principal sempre roda no vídeo inteiro, sem depender de
+// o código estar perfeitamente alinhado na caixinha da tela.
+const cropCanvas = document.createElement('canvas');
+const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true });
+const ESCALA_ZOOM = 2;
+
+function obterFrameAmpliado() {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (!vw || !vh) return null;
+  // recorte generoso: 85% x 55% do quadro, centralizado — só corta as bordas
+  const cropW = vw * 0.85, cropH = vh * 0.55;
+  const cropX = (vw - cropW) / 2, cropY = (vh - cropH) / 2;
+  cropCanvas.width = cropW * ESCALA_ZOOM;
+  cropCanvas.height = cropH * ESCALA_ZOOM;
+  cropCtx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, cropCanvas.width, cropCanvas.height);
+  return cropCanvas;
+}
+
+// Valida o dígito verificador (módulo 11) da chave de acesso da NF-e.
+// Quando bate, aceitamos a leitura na hora, sem precisar ler 2-3x seguidas.
+function validarChaveNFe(chave44) {
+  if (!/^\d{44}$/.test(chave44)) return false;
+  const digitos = chave44.split('').map(Number);
+  const dvInformado = digitos[43];
+  const base = digitos.slice(0, 43);
+  let peso = 2, soma = 0;
+  for (let i = base.length - 1; i >= 0; i--) {
+    soma += base[i] * peso;
+    peso = peso === 9 ? 2 : peso + 1;
+  }
+  const resto = soma % 11;
+  const dvCalculado = (resto === 0 || resto === 1) ? 0 : 11 - resto;
+  return dvCalculado === dvInformado;
+}
 
 const MIN_LEN = 20;
 const PAUSA_LEITOR = 200;
@@ -163,6 +208,7 @@ document.getElementById('btnFecharLeitor').addEventListener('click', pararLeitor
 document.getElementById('btnLimparLista').addEventListener('click', () => {
   chavesLidas = []; renderLista();
 });
+btnTorch.addEventListener('click', toggleTorch);
 
 document.addEventListener('keydown', function(e) {
   if (modoLeitor) capturarTeclaLeitor(e);
@@ -202,10 +248,17 @@ async function iniciarScanner() {
   cameraHint.textContent = '⬡ INICIANDO...';
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1920 }, height: { ideal: 1080 },
+        // pede foco contínuo/macro direto na constraint quando suportado
+        advanced: [{ focusMode: 'continuous' }]
+      }
     });
     video.srcObject = stream;
     await video.play();
+    ajustarFocoContinuo();
+    prepararTorch();
     cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
     if (NATIVE_SUPPORTED) iniciarBarcodeDetectorNativo();
     else await iniciarZXing();
@@ -213,6 +266,45 @@ async function iniciarScanner() {
     console.error('[CAMERA]', err);
     alert('Erro ao acessar a câmera. Verifique as permissões.');
     pararScanner();
+  }
+}
+
+async function ajustarFocoContinuo() {
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  if (!track || !track.getCapabilities) return;
+  try {
+    const caps = track.getCapabilities();
+    if (caps.focusMode && caps.focusMode.includes('continuous')) {
+      await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+    }
+  } catch(e) { /* nem todo navegador suporta — ignora */ }
+}
+
+function prepararTorch() {
+  torchOn = false;
+  btnTorch.style.display = 'none';
+  btnTorch.classList.remove('ativo');
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  if (!track || !track.getCapabilities) return;
+  try {
+    const caps = track.getCapabilities();
+    if (caps.torch) btnTorch.style.display = 'flex';
+  } catch(e) {}
+}
+
+async function toggleTorch() {
+  if (!stream) return;
+  const track = stream.getVideoTracks()[0];
+  if (!track) return;
+  try {
+    torchOn = !torchOn;
+    await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+    btnTorch.classList.toggle('ativo', torchOn);
+  } catch(e) {
+    torchOn = !torchOn;
+    alert('Lanterna não suportada neste dispositivo.');
   }
 }
 
@@ -225,6 +317,9 @@ function pararScanner() {
   if (zxingReader) { try { zxingReader.reset(); } catch(e) {} zxingReader = null; }
   if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
   cameraContainer.style.display = 'none';
+  btnTorch.style.display = 'none';
+  btnTorch.classList.remove('ativo');
+  torchOn = false;
   btnEscanear.style.display = 'flex';
   btnLeitorCodigo.style.display = 'flex';
 }
@@ -251,24 +346,47 @@ function iniciarBarcodeDetectorNativo() {
   const detector = new BarcodeDetector({ formats: ['code_128','itf','ean_13','ean_8','code_39','qr_code'] });
   let ultimoCodigo = '';
   let contagemVotos = 0;
+  let framesSemLeitura = 0;
   const MIN_VOTOS = 2;
+
+  async function tentarDetectar(alvo) {
+    try {
+      const barcodes = await detector.detect(alvo);
+      if (barcodes.length === 0) return null;
+      const melhor = barcodes.reduce((a, b) => a.rawValue.length >= b.rawValue.length ? a : b);
+      return melhor.rawValue.replace(/\D/g, '');
+    } catch(e) { return null; }
+  }
 
   async function loop() {
     if (!scannerAtivo || loopPausado) return;
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      try {
-        const barcodes = await detector.detect(video);
-        if (barcodes.length > 0) {
-          const melhor = barcodes.reduce((a, b) => a.rawValue.length >= b.rawValue.length ? a : b);
-          const limpo = melhor.rawValue.replace(/\D/g, '');
-          if (limpo === cooldownCodigo) { rafId = requestAnimationFrame(loop); return; }
+      // 1) tenta no quadro inteiro (não depende de alinhamento na caixinha)
+      let limpo = await tentarDetectar(video);
+      // 2) se não achou, a cada poucos frames tenta um recorte ampliado (reforço p/ código pequeno)
+      if (!limpo && framesSemLeitura % 4 === 0) {
+        const ampliado = obterFrameAmpliado();
+        if (ampliado) limpo = await tentarDetectar(ampliado);
+      }
+      if (limpo) {
+        framesSemLeitura = 0;
+        if (limpo !== cooldownCodigo) {
+          if (limpo.length === 44 && validarChaveNFe(limpo)) {
+            cameraHint.textContent = '⬡ CHAVE VÁLIDA ✓';
+            registrarChave(limpo); retomarLoop(limpo); return;
+          }
           if (limpo.length >= MIN_LEN) {
             if (limpo === ultimoCodigo) { contagemVotos++; } else { ultimoCodigo = limpo; contagemVotos = 1; }
             cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
             if (contagemVotos >= MIN_VOTOS) { registrarChave(limpo); retomarLoop(limpo); return; }
           } else { cameraHint.textContent = '⬡ CÓDIGO DETECTADO – APROXIME MAIS'; }
-        } else { cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA'; }
-      } catch(e) {}
+        }
+      } else {
+        framesSemLeitura++;
+        cameraHint.textContent = framesSemLeitura > 90
+          ? '⬡ SEM LEITURA — TENTE MAIS LUZ / LANTERNA'
+          : '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
+      }
     }
     rafId = requestAnimationFrame(loop);
   }
@@ -291,33 +409,53 @@ async function iniciarZXing() {
   const reader = new ZXing.MultiFormatReader();
   reader.setHints(hints);
   zxingReader = reader;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const fullCanvas = document.createElement('canvas');
+  const fullCtx = fullCanvas.getContext('2d', { willReadFrequently: true });
   let ultimoCodigo = '';
   let contagemVotos = 0;
-  const MIN_VOTOS = 3;
+  let framesSemLeitura = 0;
+  const MIN_VOTOS = 2;
+
+  function decodificar(canvas, ctx) {
+    try {
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
+      const binary = new ZXing.HybridBinarizer(luminance);
+      const bitmap = new ZXing.BinaryBitmap(binary);
+      const result = reader.decode(bitmap);
+      return result.getText().replace(/\D/g, '');
+    } catch(e) { return null; }
+  }
 
   function loop() {
     if (!scannerAtivo || loopPausado) return;
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-      try {
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const luminance = new ZXing.RGBLuminanceSource(imgData.data, canvas.width, canvas.height);
-        const binary = new ZXing.HybridBinarizer(luminance);
-        const bitmap = new ZXing.BinaryBitmap(binary);
-        const result = reader.decode(bitmap);
-        const limpo = result.getText().replace(/\D/g, '');
-        if (limpo === cooldownCodigo) { rafId = requestAnimationFrame(loop); return; }
+      // 1) quadro inteiro
+      fullCanvas.width = video.videoWidth;
+      fullCanvas.height = video.videoHeight;
+      fullCtx.drawImage(video, 0, 0);
+      let limpo = decodificar(fullCanvas, fullCtx);
+      // 2) reforço com recorte ampliado a cada poucos frames, se não achou nada
+      if (!limpo && framesSemLeitura % 4 === 0) {
+        const ampliado = obterFrameAmpliado();
+        if (ampliado) limpo = decodificar(ampliado, cropCtx);
+      }
+      if (limpo && limpo !== cooldownCodigo) {
+        framesSemLeitura = 0;
+        if (limpo.length === 44 && validarChaveNFe(limpo)) {
+          cameraHint.textContent = '⬡ CHAVE VÁLIDA ✓';
+          registrarChave(limpo); retomarLoop(limpo); return;
+        }
         if (limpo.length >= MIN_LEN) {
           if (limpo === ultimoCodigo) { contagemVotos++; } else { ultimoCodigo = limpo; contagemVotos = 1; }
           cameraHint.textContent = `⬡ ${limpo.length} DÍGITOS · ${contagemVotos}/${MIN_VOTOS}`;
           if (contagemVotos >= MIN_VOTOS) { registrarChave(limpo); retomarLoop(limpo); return; }
         }
-      } catch(e) {
-        cameraHint.textContent = '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
+      } else if (!limpo) {
+        framesSemLeitura++;
+        cameraHint.textContent = framesSemLeitura > 90
+          ? '⬡ SEM LEITURA — TENTE MAIS LUZ / LANTERNA'
+          : '⬡ POSICIONE O CÓDIGO DENTRO DA ÁREA';
       }
     }
     rafId = requestAnimationFrame(loop);
@@ -421,14 +559,20 @@ function renderLista() {
     listaChaves.innerHTML = '<p class="empty-state">// nenhuma chave lida ainda</p>';
     return;
   }
-  listaChaves.innerHTML = chavesLidas.map(item => `
+  listaChaves.innerHTML = chavesLidas.map(item => {
+    const valida = item.codigo.length === 44 && validarChaveNFe(item.codigo);
+    const status = item.codigo.length !== 44
+      ? `⚠ ${item.codigo.length} dígitos (esperado 44)`
+      : (valida ? '✓ dígito verificador OK' : '⚠ dígito verificador não confere — confira manualmente');
+    return `
     <div class="chave-card" id="card-${item.id}">
       <div class="chave-numero">${item.codigo}</div>
       <div class="chave-meta">
-        <span class="chave-len">${item.codigo.length} dígitos ${item.codigo.length === 44 ? '✓' : '⚠ esperado 44'} · ${formatarHora(item.hora)}</span>
+        <span class="chave-len">${status} · ${formatarHora(item.hora)}</span>
         <button class="btn-copiar" onclick="copiarChave('${item.id}','${item.codigo}')">📋 Copiar</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function copiarChave(id, codigo) {
